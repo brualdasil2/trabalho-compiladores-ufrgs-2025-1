@@ -1,0 +1,5 @@
+*.o
+lex.yy.c
+etapa2
+parser.tab.c
+parser.tab.h
