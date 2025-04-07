@@ -60,10 +60,8 @@ T6: T6 TK_OC_EQ T5 | T6 TK_OC_NE T5 | T5
 T5: T5 TK_OC_GE T4 | T5 TK_OC_LE T4 | T5 '<' T4 | T5 '>' T4 | T4
 T4: T4 '+' T3 | T4 '-' T3 | T3
 T3: T3 '*' T2 | T3 '/' T2 | T3 '%' T2 | T2
-T2: '+' T1 | '-' T1 | '!' T1 | T1
-T1: Operando | '(' Operando ')'
-Operando: TK_ID | Literal | Chama_func | Expressao
-
+T2: '+' T2 | '-' T2 | '!' T2 | T1
+T1: '(' Expressao ')' | TK_ID | Literal | Chama_func
 %%
 
 void yyerror (char const *mensagem) {

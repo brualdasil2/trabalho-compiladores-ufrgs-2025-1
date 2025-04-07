@@ -1,5 +1,6 @@
 CC := gcc
-CFLAGS := -fsanitize=address # TODO: quando add isso, dá erro de compilação
+CFLAGS := -fsanitize=address
+LFLAGS := -fsanitize=address
 OBJDIR := obj
 SRC := $(wildcard *.c)
 TARGET := etapa2
@@ -13,10 +14,10 @@ SRC += $(BISON_C)
 OBJ := $(SRC:.c=.o)
 
 $(TARGET): $(OBJ)
-	$(CC) $^ -o $@
+	$(CC) $(LFLAGS) $^ -o $@
 
 %.o: %.c
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 main.o: $(BISON_C)
 
