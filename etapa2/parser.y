@@ -51,10 +51,18 @@ Chama_func: TK_ID '(' Lista_args ')' | TK_ID '(' ')'
 Lista_args: Arg ',' Lista_args | Arg
 Arg: Expressao
 Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo
-
-// testes
-Expressao: TK_LI_INT
-Fluxo: TK_PR_IF
+Fluxo: Fluxo_cond | Fluxo_iter
+Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco | TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco
+Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco
+Expressao: Expressao '|' T7 | T7
+T7: T7 '&' T6 | T6
+T6: T6 TK_OC_EQ T5 | T6 TK_OC_NE T5 | T5
+T5: T5 TK_OC_GE T4 | T5 TK_OC_LE T4 | T5 '<' T4 | T5 '>' T4 | T4
+T4: T4 '+' T3 | T4 '-' T3 | T3
+T3: T3 '*' T2 | T3 '/' T2 | T3 '%' T2 | T2
+T2: '+' T1 | '-' T1 | '!' T1 | T1
+T1: Operando | '(' Operando ')'
+Operando: TK_ID | Literal | Chama_func | Expressao
 
 %%
 

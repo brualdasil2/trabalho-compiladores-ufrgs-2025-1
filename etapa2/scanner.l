@@ -40,7 +40,7 @@ with { return TK_PR_WITH; }
 ; { return (int)(yytext[0]); }
 \<\= { return TK_OC_LE; }
 \>\= { return TK_OC_GE; }
-\=\= { return TK_OC_GE; }
+\=\= { return TK_OC_EQ; }
 \!\= { return TK_OC_NE; }
 
 [a-z_][a-z0-9_]* { return TK_ID; }
