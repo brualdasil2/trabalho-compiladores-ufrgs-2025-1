@@ -3,4 +3,10 @@ main returns int is [
     declare y as int with 3
     declare z as int
     z is x + y
-];
+],
+
+foo returns float is [
+    declare a as int with 1
+    declare b as int with 0
+    a is a * b
+]

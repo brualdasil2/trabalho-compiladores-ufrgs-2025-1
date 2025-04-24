@@ -1,0 +1,51 @@
+digraph grafo {
+  main [ label="main" ];
+  main -> with1;
+  with1 [ label="with" ];
+  with1 -> x;
+  x [ label="x" ];
+  with1 -> 2;
+  2 [ label="2" ];
+  with1 -> with2;
+  with2 [ label="with" ];
+  with2 -> y;
+  y [ label="y" ];
+  with2 -> 3;
+  3 [ label="3" ];
+  with2 -> is1;
+  is1 [ label="is" ];
+  is1 -> z;
+  z [ label="z" ];
+  is1 -> plus;
+  plus [ label="+" ];
+  plus -> x2;
+  x2 [ label="x" ];
+  plus -> y2;
+  y2 [ label="y" ];
+  main -> foo;
+  foo [ label="foo" ];
+  foo -> with3;
+  with3 [ label="with" ];
+  with3 -> a
+  a [ label="a" ];
+  with3 -> 1
+  1 [ label="1" ];
+  with3 -> with4
+  with4 [ label="with" ];
+  with4 -> b
+  b [ label="b" ];
+  with4 -> 0
+  0 [ label="0" ];
+  with4 -> is2
+  is2 [ label="is" ];
+  is2 -> a2;
+  a2 [ label="a" ];
+  is2 -> times;
+  times [ label="*" ];
+  times -> a3;
+  a3 [ label="a" ];
+  times -> b2;
+  b2 [ label="b" ];
+
+
+}

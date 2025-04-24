@@ -59,6 +59,7 @@ extern asd_tree_t *arvore;
 %type<no> Lista_com
 %type<no> Dec_var
 %type<no> Dec_var_com
+%type<no> Dec_var_com_atrib
 %type<no> Identificador
 %type<no> Literal
 %type<no> Atrib
@@ -92,36 +93,44 @@ extern asd_tree_t *arvore;
 
 %%
 
-Programa: Lista
+Programa: Lista { $$ = NULL; }
 Programa: { $$ = NULL; }
-Lista: Elemento ',' Lista | Elemento ';'
-Elemento: Def_func | Dec_var
-Def_func: Cab_func Corpo_func
-Cab_func: TK_ID TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS
-Cab_func: TK_ID TK_PR_RETURNS Tipo TK_PR_IS
-Lista_params: Parametro ',' Lista_params | Parametro
-Parametro: TK_ID TK_PR_AS Tipo
-Tipo: TK_PR_INT | TK_PR_FLOAT
-Corpo_func: Bloco
-Comando: Bloco
-Comando: Dec_var_com {
+Lista: Elemento ',' Lista { $$ = NULL; }
+Lista: Elemento ';' { $$ = NULL; }
+Elemento: Def_func { $$ = NULL; }
+Elemento: Dec_var { $$ = NULL; }
+Def_func: Cab_func Corpo_func { $$ = NULL; }
+Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS { $$ = NULL; }
+Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { $$ = NULL; }
+Lista_params: Parametro ',' Lista_params { $$ = NULL; }
+Lista_params: Parametro { $$ = NULL; }
+Parametro: Identificador TK_PR_AS Tipo { $$ = NULL; }
+Tipo: TK_PR_INT { $$ = NULL; }
+Tipo: TK_PR_FLOAT { $$ = NULL; }
+Corpo_func: Bloco { $$ = NULL; }
+Comando: Bloco { $$ = NULL; }
+Comando: Dec_var_com { $$ = NULL; }
+Comando: Dec_var_com_atrib {
+    arvore = asd_new("root");
     asd_add_child(arvore, $1);
 }
-Comando: Atrib
-Comando: Chama_func
-Comando: Retorno
-Comando: Fluxo
-Bloco: '[' Lista_com ']' | '[' ']'
+Comando: Atrib { $$ = NULL; }
+Comando: Chama_func { $$ = NULL; }
+Comando: Retorno { $$ = NULL; }
+Comando: Fluxo { $$ = NULL; }
+Bloco: '[' Lista_com ']' { $$ = NULL; }
+Bloco: '[' ']' { $$ = NULL; }
 Lista_com: Comando Lista_com { 
 //    $$ = $1; 
   //  asd_add_child($1, $2);
+  $$ = NULL;
  } // add o resto da lista de comandos como filho do primeiro comando
-Lista_com: Comando { $$ = $1; }
-Dec_var: TK_PR_DECLARE TK_ID TK_PR_AS Tipo
-Dec_var_com: Dec_var // não vai na AST, ou seja, $$ = NULL?? ou nada?
+Lista_com: Comando { $$ = NULL; }
+Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo { $$ = NULL; }
+Dec_var_com: Dec_var { $$ = NULL; } // não vai na AST, ou seja, $$ = NULL?? ou nada?
 // troca Dec_var pra poder acessar o TK_ID
-// Dec_var_com: Dec_var TK_PR_WITH Literal { /*Cria no with, bota o ID do Dec_var como um filho, e o literal como outro filho*/ }
-Dec_var_com: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal { 
+// Dec_var_com_atrib: Dec_var TK_PR_WITH Literal { /*Cria no with, bota o ID do Dec_var como um filho, e o literal como outro filho*/ }
+Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal { 
     // Cria nó "with" com 2 filhos: id e literal
     $$ = asd_new("with");
     asd_add_child($$, $2);
@@ -130,31 +139,45 @@ Dec_var_com: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal {
 Identificador: TK_ID { $$ = asd_new($1->lexema); free($1->lexema); free($1); }
 Literal: TK_LI_INT { $$ = asd_new($1->lexema); free($1->lexema); free($1); }
 Literal: TK_LI_FLOAT { $$ = asd_new($1->lexema); free($1->lexema); free($1); }
-Atrib: TK_ID TK_PR_IS Expressao
-Chama_func: TK_ID '(' Lista_args ')' | TK_ID '(' ')'
-Lista_args: Arg ',' Lista_args | Arg
-Arg: Expressao
-Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo
-Fluxo: Fluxo_cond | Fluxo_iter
-Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco | TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco
-Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco
-Expressao: Expressao '|' T7 | T7
-T7: T7 '&' T6 | T6
-T6: T6 TK_OC_EQ T5 | T6 TK_OC_NE T5 | T5
-T5: T5 TK_OC_GE T4 | T5 TK_OC_LE T4 | T5 '<' T4 | T5 '>' T4 | T4
-T4: T4 '+' T3 | T4 '-' T3 | T3
-T3: T3 '*' T2
-T3: T3 '/' T2 
-T3: T3 '%' T2 
-T3: T2 { $$ = $1; }
-T2: '+' T2
-T2: '-' T2 
-T2: '!' T2 { $$ = asd_new("!"); asd_add_child($$, $2);}
-T2: T1 { $$ = $1; }
-T1: '(' Expressao ')'
-T1: TK_ID { $$ = asd_new($1->lexema); free($1->lexema); free($1); }
-T1: Literal { $$ = $1; }
-T1: Chama_func
+Atrib: Identificador TK_PR_IS Expressao { $$ = NULL; }
+Chama_func: Identificador '(' Lista_args ')' { $$ = NULL; }
+Chama_func: Identificador '(' ')' { $$ = NULL; }
+Lista_args: Arg ',' Lista_args { $$ = NULL; }
+Lista_args: Arg { $$ = NULL; }
+Arg: Expressao { $$ = NULL; }
+Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo { $$ = NULL; }
+Fluxo: Fluxo_cond { $$ = NULL; }
+Fluxo: Fluxo_iter { $$ = NULL; }
+Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco { $$ = NULL; }
+Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco { $$ = NULL; }
+Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco { $$ = NULL; }
+Expressao: Expressao '|' T7 { $$ = NULL; }
+Expressao: T7 { $$ = NULL; }
+T7: T7 '&' T6 { $$ = NULL; }
+T7: T6 { $$ = NULL; }
+T6: T6 TK_OC_EQ T5 { $$ = NULL; }
+T6: T6 TK_OC_NE T5 { $$ = NULL; }
+T6: T5 { $$ = NULL; }
+T5: T5 TK_OC_GE T4 { $$ = NULL; }
+T5: T5 TK_OC_LE T4 { $$ = NULL; }
+T5: T5 '<' T4 { $$ = NULL; }
+T5: T5 '>' T4 { $$ = NULL; }
+T5: T4 { $$ = NULL; }
+T4: T4 '+' T3 { $$ = NULL; }
+T4: T4 '-' T3 { $$ = NULL; }
+T4: T3 { $$ = NULL; }
+T3: T3 '*' T2 { $$ = NULL; }
+T3: T3 '/' T2  { $$ = NULL; }
+T3: T3 '%' T2  { $$ = NULL; }
+T3: T2 { $$ = NULL; }
+T2: '+' T2 { $$ = NULL; }
+T2: '-' T2  { $$ = NULL; }
+T2: '!' T2 { $$ = NULL; }
+T2: T1 { $$ = NULL; }
+T1: '(' Expressao ')' { $$ = NULL; }
+T1: Identificador { $$ = NULL; }
+T1: Literal { $$ = NULL; }
+T1: Chama_func { $$ = NULL; }
 %%
 
 void yyerror (char const *mensagem) {
