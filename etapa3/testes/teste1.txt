@@ -9,4 +9,4 @@ foo returns float is [
     declare a as int with 1
     declare b as int with 0
     a is a * b
-]
+];

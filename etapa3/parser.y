@@ -93,53 +93,181 @@ extern asd_tree_t *arvore;
 
 %%
 
-Programa: Lista { $$ = NULL; }
+Programa: Lista { 
+    printf("Lista -> Programa\n");
+    arvore = $1;
+}
 Programa: { $$ = NULL; }
-Lista: Elemento ',' Lista { $$ = NULL; }
-Lista: Elemento ';' { $$ = NULL; }
-Elemento: Def_func { $$ = NULL; }
-Elemento: Dec_var { $$ = NULL; }
-Def_func: Cab_func Corpo_func { $$ = NULL; }
-Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS { $$ = NULL; }
-Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { $$ = NULL; }
-Lista_params: Parametro ',' Lista_params { $$ = NULL; }
-Lista_params: Parametro { $$ = NULL; }
-Parametro: Identificador TK_PR_AS Tipo { $$ = NULL; }
+Lista: Elemento ',' Lista {
+    printf("Elemento, Lista -> Lista\n");
+    if ($3 == NULL && $1 != NULL) {
+        // Lista pode ser NULL (dec var global), retorna só a função
+        $$ = $1;        
+    }
+    else if ($1 == NULL && $3 != NULL) {
+        // Elemento pode ser NULL, retorna só o resto da lista
+        $$ = $3;
+    }
+    else if ($1 == NULL && $3 == NULL) {
+        $$ = NULL;
+    }
+    else {
+        // Os dois existem, bota lista de filho do elemento
+        asd_add_child($1, $3);
+        $$ = $1;
+    }
+}
+Lista: Elemento ';' { 
+    printf("Elemento; -> Lista\n");
+    $$ = $1;
+}
+Elemento: Def_func { 
+    printf("Def_func -> Elemento\n");
+    $$ = $1;
+}
+Elemento: Dec_var { 
+    printf("Dev_var -> Elemento\n");
+    $$ = NULL;
+}
+Def_func: Cab_func Corpo_func { 
+    printf("Cab_func Corpo_func -> Def_func\n");
+    $$ = $1;
+    asd_add_child($1, $2);
+    //if (arvore == NULL) {
+        // Primeira função, vira raiz
+      //  arvore = $1;
+    //}
+}
+Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS { 
+    printf("id returns tipo with lista_params is -> Cab_func\n");
+    $$ = $1;
+}
+Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { 
+    printf("id returns tipo is -> Cab_func");
+    $$ = $1;
+}
+Lista_params: Parametro ',' Lista_params {
+    printf("Param , Lista_params -> Lista_params\n");
+    $$ = NULL;
+}
+Lista_params: Parametro {
+    printf("Param -> Lista_params\n");
+    $$ = NULL;
+}
+Parametro: Identificador TK_PR_AS Tipo { 
+    printf("id as Tipo -> Param\n");
+    $$ = NULL;
+    asd_free($1);
+}
 Tipo: TK_PR_INT { $$ = NULL; }
 Tipo: TK_PR_FLOAT { $$ = NULL; }
-Corpo_func: Bloco { $$ = NULL; }
-Comando: Bloco { $$ = NULL; }
-Comando: Dec_var_com { $$ = NULL; }
-Comando: Dec_var_com_atrib {
-    arvore = asd_new("root");
-    asd_add_child(arvore, $1);
+Corpo_func: Bloco {
+    printf("Bloco -> Corpo_func\n"); 
+    $$ = $1;
 }
-Comando: Atrib { $$ = NULL; }
-Comando: Chama_func { $$ = NULL; }
-Comando: Retorno { $$ = NULL; }
-Comando: Fluxo { $$ = NULL; }
-Bloco: '[' Lista_com ']' { $$ = NULL; }
-Bloco: '[' ']' { $$ = NULL; }
+Comando: Bloco { 
+    printf("Bloco -> Comando\n");
+    $$ = $1;
+}
+Comando: Dec_var_com { 
+    printf("Dec_var_com -> Comando\n");
+    $$ = $1;
+    // Pode ser NULL! Tratar isso na lista de comando
+}
+Comando: Dec_var_com_atrib {
+    printf("Dec_var_com_atrib -> Comando\n");
+    $$ = $1;
+}
+Comando: Atrib {
+    printf("Atrib -> Comando\n");
+    $$ = $1;
+}
+Comando: Chama_func {
+    printf("Chama_func -> Comando\n");
+    $$ = $1;
+}
+Comando: Retorno {
+    printf("Retorno -> Comando\n");
+    $$ = $1;
+}
+Comando: Fluxo {
+    printf("Fluxo -> Comando\n");
+    $$ = $1;
+}
+Bloco: '[' Lista_com ']' { 
+    printf("[ Lista_com ] -> Bloco\n");
+    $$ = $2;
+}
+Bloco: '[' ']' {
+    printf("[ ] -> Bloco\n");
+    $$ = NULL;
+}
 Lista_com: Comando Lista_com { 
-//    $$ = $1; 
-  //  asd_add_child($1, $2);
-  $$ = NULL;
- } // add o resto da lista de comandos como filho do primeiro comando
-Lista_com: Comando { $$ = NULL; }
-Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo { $$ = NULL; }
-Dec_var_com: Dec_var { $$ = NULL; } // não vai na AST, ou seja, $$ = NULL?? ou nada?
+    printf("Comando Lista_com -> Lista_com\n");
+    if ($2 == NULL && $1 != NULL) {
+        // Lista_com pode ser NULL, retorna só o Comando
+        $$ = $1;
+    }
+    else if ($1 == NULL && $2 != NULL) {
+        // Comando pode ser NULL, retorna só a Lista_com pra ligar com os de cima
+        $$ = $2;
+    }
+    else if ($1 == NULL && $2 == NULL) {
+        $$ = NULL;
+    }
+    else {
+        // Comando e Lista_com existem, bota Lista_com como filho e retorna o comando
+        asd_add_child($1, $2);
+        $$ = $1;
+    }
+}
+Lista_com: Comando {
+    printf("Comando -> Lista_com\n");
+    $$ = $1;
+}
+Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo { 
+    printf("declare id as Tipo -> Dec_var\n");
+    $$ = NULL;
+    // Nem todo identificador vai virar um nó, nesses casos deletamos o nó que foi alocado
+    asd_free($2);
+}
+Dec_var_com: Dec_var { 
+    printf("Dec_var -> Dec_var_com\n");
+    $$ = NULL;
+}
 // troca Dec_var pra poder acessar o TK_ID
 // Dec_var_com_atrib: Dec_var TK_PR_WITH Literal { /*Cria no with, bota o ID do Dec_var como um filho, e o literal como outro filho*/ }
 Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal { 
+    printf("dec id as tipo with lit -> Dec_var_com_atrib\n");
     // Cria nó "with" com 2 filhos: id e literal
     $$ = asd_new("with");
     asd_add_child($$, $2);
-    asd_add_child($$, $6); 
+    asd_add_child($$, $6);
 }
-Identificador: TK_ID { $$ = asd_new($1->lexema); free($1->lexema); free($1); }
-Literal: TK_LI_INT { $$ = asd_new($1->lexema); free($1->lexema); free($1); }
-Literal: TK_LI_FLOAT { $$ = asd_new($1->lexema); free($1->lexema); free($1); }
-Atrib: Identificador TK_PR_IS Expressao { $$ = NULL; }
+Identificador: TK_ID { 
+    printf("id -> Identificador\n");
+    $$ = asd_new($1->lexema);
+    free($1->lexema);
+    free($1); 
+}
+Literal: TK_LI_INT { 
+    printf("lit_int -> Literal\n");
+    $$ = asd_new($1->lexema);
+    free($1->lexema);
+    free($1);
+}
+Literal: TK_LI_FLOAT { 
+    printf("lit_float -> Literal\n");
+    $$ = asd_new($1->lexema);
+    free($1->lexema);
+    free($1);
+}
+Atrib: Identificador TK_PR_IS Expressao { 
+    printf("id is exp -> Atrib\n");
+    $$ = asd_new("is");
+    asd_add_child($$, $1); 
+    asd_add_child($$, $3);
+}
 Chama_func: Identificador '(' Lista_args ')' { $$ = NULL; }
 Chama_func: Identificador '(' ')' { $$ = NULL; }
 Lista_args: Arg ',' Lista_args { $$ = NULL; }
@@ -152,31 +280,44 @@ Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco { $$ = NULL; }
 Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco { $$ = NULL; }
 Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco { $$ = NULL; }
 Expressao: Expressao '|' T7 { $$ = NULL; }
-Expressao: T7 { $$ = NULL; }
+Expressao: T7 {
+    printf("T7 -> Expr\n");
+    $$ = $1;
+}
 T7: T7 '&' T6 { $$ = NULL; }
-T7: T6 { $$ = NULL; }
+T7: T6 { $$ = $1; }
 T6: T6 TK_OC_EQ T5 { $$ = NULL; }
 T6: T6 TK_OC_NE T5 { $$ = NULL; }
-T6: T5 { $$ = NULL; }
+T6: T5 { $$ = $1; }
 T5: T5 TK_OC_GE T4 { $$ = NULL; }
 T5: T5 TK_OC_LE T4 { $$ = NULL; }
 T5: T5 '<' T4 { $$ = NULL; }
 T5: T5 '>' T4 { $$ = NULL; }
-T5: T4 { $$ = NULL; }
-T4: T4 '+' T3 { $$ = NULL; }
+T5: T4 { $$ = $1; }
+T4: T4 '+' T3 { 
+    printf("T4 + T3 -> T4\n");
+    $$ = asd_new("+");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 T4: T4 '-' T3 { $$ = NULL; }
-T4: T3 { $$ = NULL; }
-T3: T3 '*' T2 { $$ = NULL; }
+T4: T3 { $$ = $1; }
+T3: T3 '*' T2 { 
+    printf("T3 * T2 -> T2\n");
+    $$ = asd_new("*");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 T3: T3 '/' T2  { $$ = NULL; }
 T3: T3 '%' T2  { $$ = NULL; }
-T3: T2 { $$ = NULL; }
+T3: T2 { $$ = $1; }
 T2: '+' T2 { $$ = NULL; }
 T2: '-' T2  { $$ = NULL; }
 T2: '!' T2 { $$ = NULL; }
-T2: T1 { $$ = NULL; }
-T1: '(' Expressao ')' { $$ = NULL; }
-T1: Identificador { $$ = NULL; }
-T1: Literal { $$ = NULL; }
+T2: T1 { $$ = $1; }
+T1: '(' Expressao ')' { $$ = $2; }
+T1: Identificador { $$ = $1; }
+T1: Literal { $$ = $1; }
 T1: Chama_func { $$ = NULL; }
 %%
 
