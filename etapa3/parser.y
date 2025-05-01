@@ -268,31 +268,106 @@ Atrib: Identificador TK_PR_IS Expressao {
     asd_add_child($$, $1); 
     asd_add_child($$, $3);
 }
-Chama_func: Identificador '(' Lista_args ')' { $$ = NULL; }
-Chama_func: Identificador '(' ')' { $$ = NULL; }
-Lista_args: Arg ',' Lista_args { $$ = NULL; }
-Lista_args: Arg { $$ = NULL; }
-Arg: Expressao { $$ = NULL; }
-Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo { $$ = NULL; }
-Fluxo: Fluxo_cond { $$ = NULL; }
-Fluxo: Fluxo_iter { $$ = NULL; }
-Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco { $$ = NULL; }
-Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco { $$ = NULL; }
-Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco { $$ = NULL; }
-Expressao: Expressao '|' T7 { $$ = NULL; }
+Chama_func: Identificador '(' Lista_args ')' {
+    printf("id ( Lista_args ) -> Chama_func\n");
+    // alocar espaço pra "call $1->label"
+   // realloc($1->label, strlen("call ") + strlen($1->label))
+    char* id_label = (char*) malloc(strlen($1->label) + 1);
+    strcpy(id_label, $1->label);
+    free($1->label);
+    $1->label = (char*) malloc(strlen("call ") + strlen(id_label));
+    $1->label[0] = '\0';
+    strcat($1->label, "call ");
+    strcat($1->label, id_label);
+    asd_add_child($1, $3);
+    $$ = $1;
+}
+Chama_func: Identificador '(' ')' {
+    printf("id ( ) -> Chama_func\n");
+    // alocar espaço pra "call $1->label"
+    char* id_label = (char*) malloc(strlen($1->label) + 1);
+    strcpy(id_label, $1->label);
+    free($1->label);
+    $1->label = (char*) malloc(strlen("call ") + strlen(id_label));
+    $1->label[0] = '\0';
+    strcat($1->label, "call ");
+    strcat($1->label, id_label);
+    $$ = $1;
+}
+Lista_args: Arg ',' Lista_args {
+    asd_add_child($1, $3);
+    $$ = $1;
+}
+Lista_args: Arg { $$ = $1; }
+Arg: Expressao { $$ = $1; }
+Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo {
+    $$ = asd_new("return");
+    asd_add_child($$, $2);
+}
+Fluxo: Fluxo_cond { $$ = $1; }
+Fluxo: Fluxo_iter { $$ = $1; }
+Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco {
+    $$ = asd_new("if");
+    asd_add_child($$, $3);
+    asd_add_child($$, $5);
+}
+Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco {
+    $$ = asd_new("if");
+    asd_add_child($$, $3);
+    asd_add_child($$, $5);
+    asd_add_child($$, $7);
+}
+Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco {
+    $$ = asd_new("while");
+    asd_add_child($$, $3);
+    asd_add_child($$, $5);
+}
+Expressao: Expressao '|' T7 {
+    $$ = asd_new("|");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 Expressao: T7 {
     printf("T7 -> Expr\n");
     $$ = $1;
 }
-T7: T7 '&' T6 { $$ = NULL; }
+T7: T7 '&' T6 {
+    $$ = asd_new("&");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 T7: T6 { $$ = $1; }
-T6: T6 TK_OC_EQ T5 { $$ = NULL; }
-T6: T6 TK_OC_NE T5 { $$ = NULL; }
+T6: T6 TK_OC_EQ T5 {
+    $$ = asd_new("==");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
+T6: T6 TK_OC_NE T5 { 
+    $$ = asd_new("!=");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 T6: T5 { $$ = $1; }
-T5: T5 TK_OC_GE T4 { $$ = NULL; }
-T5: T5 TK_OC_LE T4 { $$ = NULL; }
-T5: T5 '<' T4 { $$ = NULL; }
-T5: T5 '>' T4 { $$ = NULL; }
+T5: T5 TK_OC_GE T4 { 
+    $$ = asd_new(">=");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
+T5: T5 TK_OC_LE T4 {
+    $$ = asd_new("<=");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
+T5: T5 '<' T4 {
+    $$ = asd_new("<");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
+T5: T5 '>' T4 {
+    $$ = asd_new(">");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 T5: T4 { $$ = $1; }
 T4: T4 '+' T3 { 
     printf("T4 + T3 -> T4\n");
@@ -300,7 +375,11 @@ T4: T4 '+' T3 {
     asd_add_child($$, $1);
     asd_add_child($$, $3);
 }
-T4: T4 '-' T3 { $$ = NULL; }
+T4: T4 '-' T3 {
+    $$ = asd_new("-");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 T4: T3 { $$ = $1; }
 T3: T3 '*' T2 { 
     printf("T3 * T2 -> T2\n");
@@ -308,17 +387,34 @@ T3: T3 '*' T2 {
     asd_add_child($$, $1);
     asd_add_child($$, $3);
 }
-T3: T3 '/' T2  { $$ = NULL; }
-T3: T3 '%' T2  { $$ = NULL; }
+T3: T3 '/' T2  {
+    $$ = asd_new("/");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
+T3: T3 '%' T2  {
+    $$ = asd_new("%");
+    asd_add_child($$, $1);
+    asd_add_child($$, $3);
+}
 T3: T2 { $$ = $1; }
-T2: '+' T2 { $$ = NULL; }
-T2: '-' T2  { $$ = NULL; }
-T2: '!' T2 { $$ = NULL; }
+T2: '+' T2 {
+    $$ = asd_new("+");
+    asd_add_child($$, $2);
+}
+T2: '-' T2  {
+    $$ = asd_new("-");
+    asd_add_child($$, $2);
+}
+T2: '!' T2 {
+    $$ = asd_new("!");
+    asd_add_child($$, $2);
+}
 T2: T1 { $$ = $1; }
 T1: '(' Expressao ')' { $$ = $2; }
 T1: Identificador { $$ = $1; }
 T1: Literal { $$ = $1; }
-T1: Chama_func { $$ = NULL; }
+T1: Chama_func { $$ = $1; }
 %%
 
 void yyerror (char const *mensagem) {
