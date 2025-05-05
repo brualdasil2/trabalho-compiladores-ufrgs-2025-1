@@ -132,7 +132,9 @@ Elemento: Dec_var {
 Def_func: Cab_func Corpo_func { 
     //printf("Cab_func Corpo_func -> Def_func\n");
     $$ = $1;
-    asd_add_child($1, $2);
+    if ($2 != NULL) {
+        asd_add_child($1, $2);    
+    }
     //if (arvore == NULL) {
         // Primeira função, vira raiz
       //  arvore = $1;
@@ -331,7 +333,9 @@ Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco {
     // TODO: considerar bloco pode ser NULL
     $$ = asd_new("while");
     asd_add_child($$, $3);
-    asd_add_child($$, $5);
+    if ($5 != NULL) {
+        asd_add_child($$, $5);
+    }
 }
 Expressao: Expressao '|' T7 {
     $$ = asd_new("|");
