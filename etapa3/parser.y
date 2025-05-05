@@ -275,11 +275,12 @@ Chama_func: Identificador '(' Lista_args ')' {
     char* id_label = (char*) malloc(strlen($1->label) + 1);
     strcpy(id_label, $1->label);
     free($1->label);
-    $1->label = (char*) malloc(strlen("call ") + strlen(id_label));
+    $1->label = (char*) malloc(strlen("call ") + strlen(id_label) + 1);
     $1->label[0] = '\0';
     strcat($1->label, "call ");
     strcat($1->label, id_label);
     asd_add_child($1, $3);
+    free(id_label);
     $$ = $1;
 }
 Chama_func: Identificador '(' ')' {
@@ -288,10 +289,11 @@ Chama_func: Identificador '(' ')' {
     char* id_label = (char*) malloc(strlen($1->label) + 1);
     strcpy(id_label, $1->label);
     free($1->label);
-    $1->label = (char*) malloc(strlen("call ") + strlen(id_label));
+    $1->label = (char*) malloc(strlen("call ") + strlen(id_label) + 1);
     $1->label[0] = '\0';
     strcat($1->label, "call ");
     strcat($1->label, id_label);
+    free(id_label);
     $$ = $1;
 }
 Lista_args: Arg ',' Lista_args {
