@@ -1,7 +1,7 @@
 #ifndef ITEM_TABELA_H
 #define ITEM_TABELA_H
 #include "utils.h"
-
+#include "argumento.h"
 
 typedef enum { LITERAL, IDENTIFICADOR, FUNCAO } natureza_t;
 
@@ -10,6 +10,7 @@ typedef struct s_item_tabela_t {
     char* chave;
     natureza_t natureza;
     tipo_t tipo;
+    array_argumento_t argumentos;
 } item_tabela_t;
 
 typedef struct s_array_item_tabela_t {

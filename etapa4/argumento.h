@@ -4,7 +4,6 @@
 
 
 typedef struct s_argumento_t {
-    char* lexema;
     tipo_t tipo;
 } argumento_t;
 

@@ -19,6 +19,7 @@ void insere_item_array_item_tabela(array_item_tabela_t* array, item_tabela_t ite
 void free_array_item_tabela(array_item_tabela_t* array) {
     for (int i = 0; i < array->tamanho_usado; i++) {
         free(array->itens[i].chave);
+        free(array->itens[i].argumentos.itens);
     }
     free(array->itens);
 }
