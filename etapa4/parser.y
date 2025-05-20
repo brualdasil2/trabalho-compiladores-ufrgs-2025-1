@@ -3,6 +3,9 @@
 #include <string.h>
 #include "asd.h"
 #include "token.h"
+#include "pilha_tabelas.h"
+#include "tabela_simbolos.h"
+#include "argumento.h"
 int yylex(void);
 void yyerror (char const *mensagem);
 int get_line_number();
@@ -81,10 +84,19 @@ extern asd_tree_t *arvore;
 
 %%
 
-Programa: Lista { 
-    arvore = $1;
+
+Programa: Cria_tabela_global Lista Free_tabela_global { 
+    arvore = $2;
 }
 Programa: { $$ = NULL; }
+Cria_tabela_global: {
+    init_pilha_tabelas();
+    tabela_simbolos_t* tabela = init_tabela();
+    push_pilha_tabelas(tabela);
+}
+Free_tabela_global: {
+    free_pilha_tabelas();
+}
 Lista: Elemento ',' Lista {
     if ($3 == NULL && $1 != NULL) {
         // Lista pode ser NULL (dec var global), retorna só a função
@@ -188,6 +200,17 @@ Lista_com: Comando {
     $$ = $1;
 }
 Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo { 
+    valor_t valor = $2->valor;
+    valor.lexema = strdup($2->valor.lexema);
+    tabela_simbolos_t* tabela = get_tabela_topo_pilha();
+    item_tabela_t item;
+    item.chave = valor.lexema;
+    item.natureza = NAT_IDENTIFICADOR;
+    item.tipo = INT;
+    init_array_argumento(&(item.argumentos));
+    item.linha_token = valor.linha_token;
+    insere_item_tabela_simbolos(tabela, item);
+
     $$ = NULL;
     // Nem todo identificador vai virar um nó, nesses casos deletamos o nó que foi alocado
     asd_free($2);
@@ -201,8 +224,7 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
 }
 Identificador: TK_ID {
     $$ = asd_new(*$1);
-    // ADD item na tabela
-    //free($1->lexema); o ptr do lexema será add na tabela e será liberado lá SE DER MEM LEAK DEVE SER AQUI PQ N TEM TABELA AINDA
+    free($1->lexema);
     free($1);
 }
 Literal: TK_LI_INT { 

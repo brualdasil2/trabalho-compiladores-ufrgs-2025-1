@@ -1,0 +1,5 @@
+declare x as int,
+main returns int is [
+    declare y as int
+    x is y
+];
