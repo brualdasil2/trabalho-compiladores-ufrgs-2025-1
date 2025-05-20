@@ -1,0 +1,21 @@
+declare variavel as float, 
+foo returns int is 
+[
+    if(5) 
+    [
+        declare variavel2 as int with 8
+        while(5)
+        [
+            variavel2 is 9
+        ]
+    ]
+    else
+    [
+        variavel is 3 + 2 - (2 + 1)
+        if (--variavel)
+        [
+
+        ]
+    ]
+
+];

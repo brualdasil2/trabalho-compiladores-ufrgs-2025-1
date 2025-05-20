@@ -1,0 +1,12 @@
+main returns int is [
+    declare x as int with 2
+    declare y as int with 3
+    declare z as int
+    z is x + y
+],
+
+foo returns float is [
+    declare a as int with 1
+    declare b as int with 0
+    a is a * b
+];

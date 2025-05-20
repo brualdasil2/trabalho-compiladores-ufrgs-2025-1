@@ -2,8 +2,9 @@
 #define ITEM_TABELA_H
 #include "utils.h"
 #include "argumento.h"
+#include "token.h"
 
-typedef enum { LITERAL, IDENTIFICADOR, FUNCAO } natureza_t;
+typedef enum { NAT_LITERAL, NAT_IDENTIFICADOR, NAT_FUNCAO } natureza_t;
 
 
 typedef struct s_item_tabela_t {
@@ -11,6 +12,7 @@ typedef struct s_item_tabela_t {
     natureza_t natureza;
     tipo_t tipo;
     array_argumento_t argumentos;
+    size_t linha_token;
 } item_tabela_t;
 
 typedef struct s_array_item_tabela_t {
