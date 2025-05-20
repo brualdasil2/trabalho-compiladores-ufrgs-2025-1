@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "item_tabela.h"
 #include "tabela_simbolos.h"
 #include "pilha_tabelas.h"
 

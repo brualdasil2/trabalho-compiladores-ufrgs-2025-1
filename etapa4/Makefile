@@ -1,5 +1,6 @@
 CC := gcc
 CFLAGS := -fsanitize=address
+CFLAGS += -g
 LFLAGS := -fsanitize=address
 OBJDIR := obj
 SRC := $(wildcard *.c)

@@ -1,43 +1,38 @@
 #include "tabela_simbolos.h"
-#include "hash.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 tabela_simbolos_t* init_tabela() {
     tabela_simbolos_t* tabela = (tabela_simbolos_t*) malloc(sizeof(tabela_simbolos_t));
-    for (int i = 0; i < TAM_TABELA; i++) {
-        init_array_item_tabela(&(tabela->arrays[i]));
-    }
+    tabela->itens = (item_tabela_t*) malloc(DELTA_TAM*sizeof(item_tabela_t));
+    tabela->tamanho_usado = 0;
+    tabela->tamanho_total = DELTA_TAM;
     return tabela;
 }
 
-status_t insere_item_tabela_simbolos(tabela_simbolos_t* tabela, item_tabela_t item) {
-    unsigned int hash_item = hash(item.chave, TAM_TABELA);
-    for (int i = 0; i < tabela->arrays[hash_item].tamanho_usado; i++) {
-        if (!strcmp(item.chave, tabela->arrays[hash_item].itens[i].chave)) {
-            return STATUS_ERR;
-        }
+void insere_item_tabela_simbolos(tabela_simbolos_t* tabela, item_tabela_t item) {
+    if (tabela->tamanho_usado == tabela->tamanho_total) {
+        tabela->tamanho_total += DELTA_TAM;
+        tabela->itens = (item_tabela_t*) realloc(tabela->itens, tabela->tamanho_total*sizeof(item_tabela_t));
     }
-    // item não existe, pode inserir
-    insere_item_array_item_tabela(&(tabela->arrays[hash_item]), item);
-    return STATUS_OK;
+    tabela->itens[tabela->tamanho_usado] = item;
+    tabela->tamanho_usado++;
 }
 
 item_tabela_t* busca_item_tabela_simbolos(tabela_simbolos_t* tabela, char* chave) {
-    unsigned int hash_item = hash(chave, TAM_TABELA);
-    for (int i = 0; i < tabela->arrays[hash_item].tamanho_usado; i++) {
-        if (!strcmp(chave, tabela->arrays[hash_item].itens[i].chave)) {
-            return &(tabela->arrays[hash_item].itens[i]);
+    for (int i = 0; i < tabela->tamanho_usado; i++) {
+        if (!strcmp(tabela->itens[i].chave, chave)) {
+            return &(tabela->itens[i]);
         }
     }
     return NULL;
 }
 
 void free_tabela_simbolos(tabela_simbolos_t* tabela) {
-    for (int i = 0; i < TAM_TABELA; i++) {
-        if (tabela->arrays[i].itens != NULL) {
-            free_array_item_tabela(&(tabela->arrays[i]));
-        }
+    for (int i = 0; i < tabela->tamanho_usado; i++) {
+        free(tabela->itens[i].chave);
+        free(tabela->itens[i].argumentos.itens);
     }
+    free(tabela->itens);
     free(tabela);
 }

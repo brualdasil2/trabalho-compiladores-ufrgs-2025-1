@@ -202,7 +202,7 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
 Identificador: TK_ID {
     $$ = asd_new(*$1);
     // ADD item na tabela
-    //free($1->lexema); o ptr do lexema será add na tabela e será liberado lá
+    //free($1->lexema); o ptr do lexema será add na tabela e será liberado lá SE DER MEM LEAK DEVE SER AQUI PQ N TEM TABELA AINDA
     free($1);
 }
 Literal: TK_LI_INT { 
