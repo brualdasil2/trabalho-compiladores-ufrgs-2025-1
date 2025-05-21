@@ -4,7 +4,7 @@
 
 
 typedef struct s_argumento_t {
-    tipo_t tipo;
+    tipo_dado_t tipo_dado;
 } argumento_t;
 
 typedef struct s_array_argumento_t {

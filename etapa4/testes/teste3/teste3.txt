@@ -1,5 +1,7 @@
-declare x as int,
+declare x as float,
+declare xy as float,
 main returns int is [
     declare y as int
+    declare x as int with 3
     x is y
 ];

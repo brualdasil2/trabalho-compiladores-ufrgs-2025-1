@@ -1,11 +1,15 @@
 %{
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "asd.h"
 #include "token.h"
 #include "pilha_tabelas.h"
 #include "tabela_simbolos.h"
 #include "argumento.h"
+#include "erros.h"
+#include "utils.h"
+#include "helpers_semantica.h"
 int yylex(void);
 void yyerror (char const *mensagem);
 int get_line_number();
@@ -24,14 +28,15 @@ extern asd_tree_t *arvore;
 %union {
     asd_tree_t* no;
     valor_t* valor_lexico;
+    tipo_dado_t tipo_dado;
 }
 
 %token TK_PR_AS
 %token TK_PR_DECLARE
 %token TK_PR_ELSE
-%token TK_PR_FLOAT
 %token TK_PR_IF
-%token TK_PR_INT
+%token<tipo_dado> TK_PR_FLOAT
+%token<tipo_dado> TK_PR_INT
 %token TK_PR_IS
 %token TK_PR_RETURN
 %token TK_PR_RETURNS
@@ -55,7 +60,7 @@ extern asd_tree_t *arvore;
 %type<no> Cab_func
 %type<no> Lista_params
 %type<no> Parametro
-%type<no> Tipo
+%type<tipo_dado> Tipo
 %type<no> Corpo_func
 %type<no> Comando
 %type<no> Bloco
@@ -146,8 +151,8 @@ Parametro: Identificador TK_PR_AS Tipo {
     $$ = NULL;
     asd_free($1);
 }
-Tipo: TK_PR_INT { $$ = NULL; }
-Tipo: TK_PR_FLOAT { $$ = NULL; }
+Tipo: TK_PR_INT { $$ = $1; }
+Tipo: TK_PR_FLOAT { $$ = $1; }
 Corpo_func: Bloco {
     $$ = $1;
 }
@@ -200,16 +205,8 @@ Lista_com: Comando {
     $$ = $1;
 }
 Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo { 
-    valor_t valor = $2->valor;
-    valor.lexema = strdup($2->valor.lexema);
-    tabela_simbolos_t* tabela = get_tabela_topo_pilha();
-    item_tabela_t item;
-    item.chave = valor.lexema;
-    item.natureza = NAT_IDENTIFICADOR;
-    item.tipo = INT;
-    init_array_argumento(&(item.argumentos));
-    item.linha_token = valor.linha_token;
-    insere_item_tabela_simbolos(tabela, item);
+    check_declared($2->valor.lexema);
+    insere_variavel_tabela($2->valor, $4);
 
     $$ = NULL;
     // Nem todo identificador vai virar um nó, nesses casos deletamos o nó que foi alocado
@@ -219,7 +216,10 @@ Dec_var_com: Dec_var {
     $$ = NULL;
 }
 Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal { 
+    check_declared($2->valor.lexema);
+    insere_variavel_tabela($2->valor, $4);
     valor_t valor = valor_simples("with");
+    //valor.tipo_dado_inferido = $4;
     $$ = asd_create_and_add_2(valor, $2, $6);
 }
 Identificador: TK_ID {

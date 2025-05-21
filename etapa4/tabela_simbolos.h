@@ -10,7 +10,7 @@ typedef enum { NAT_LITERAL, NAT_IDENTIFICADOR, NAT_FUNCAO } natureza_t;
 typedef struct s_item_tabela_t {
     char* chave;
     natureza_t natureza;
-    tipo_t tipo;
+    tipo_dado_t tipo_dado;
     array_argumento_t argumentos;
     size_t linha_token;
 } item_tabela_t;

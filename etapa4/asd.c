@@ -7,7 +7,8 @@ valor_t valor_simples(char* lexema) {
   valor_t valor = {
     lexema,
     0,
-    TIPO_NO
+    TIPO_NO,
+    TIPO_DADO_NADA
   };
   return valor;
 }

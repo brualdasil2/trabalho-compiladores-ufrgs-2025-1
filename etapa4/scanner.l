@@ -3,6 +3,7 @@
 #include <string.h>
 #include "parser.tab.h"
 #include "token.h"
+#include "utils.h"
 #include "asd.h"
 %}
 
@@ -13,10 +14,16 @@
 as { return TK_PR_AS; }
 declare { return TK_PR_DECLARE; }
 else { return TK_PR_ELSE; }
-float { return TK_PR_FLOAT; }
 if { return TK_PR_IF; }
-int { return TK_PR_INT; }
-is { return TK_PR_IS; }
+float { 
+    yylval.tipo_dado = TIPO_DADO_FLOAT;
+    return TK_PR_FLOAT;
+}
+int { 
+    yylval.tipo_dado = TIPO_DADO_INT;
+    return TK_PR_INT;
+}
+is { return TK_PR_IS;}
 returns { return TK_PR_RETURNS; }
 return { return TK_PR_RETURN; }
 while { return TK_PR_WHILE; }
