@@ -4,7 +4,7 @@ CFLAGS += -g
 LFLAGS := -fsanitize=address
 OBJDIR := obj
 SRC := $(wildcard *.c)
-TARGET := etapa3
+TARGET := etapa4
 FLEX_RULES := scanner.l
 FLEX_C := lex.yy.c
 BISON_RULES := parser.y

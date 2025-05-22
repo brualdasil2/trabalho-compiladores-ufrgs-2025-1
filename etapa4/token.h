@@ -8,7 +8,7 @@ typedef struct {
     char* lexema;
     int linha_token;
     tipo_token_t tipo;
-    //tipo_dado_t tipo_dado_inferido;
+    tipo_dado_t tipo_dado_inferido;
 } valor_t;
 
 #endif // TOKEN_H

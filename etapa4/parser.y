@@ -79,6 +79,7 @@ extern asd_tree_t *arvore;
 %type<no> Fluxo_cond
 %type<no> Fluxo_iter
 %type<no> Expressao
+%type<no> T8
 %type<no> T7
 %type<no> T6
 %type<no> T5
@@ -136,9 +137,15 @@ Def_func: Cab_func Corpo_func {
     }
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS { 
+    check_declared($1->valor.lexema);
+    insere_funcao_tabela($1->valor, $3);
+    // TODO: criar lista encadeada de args, extrair ela do $5 e passar junto pra insere_func_tab, que vai converter de lista enc de args pra array de args, inserir na tabela e dar free da lista enc
     $$ = $1;
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { 
+    check_declared($1->valor.lexema);
+    insere_funcao_tabela($1->valor, $3);
+    // TODO: passar NULL como argumento da lista args
     $$ = $1;
 }
 Lista_params: Parametro ',' Lista_params {
@@ -219,10 +226,11 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
     check_declared($2->valor.lexema);
     insere_variavel_tabela($2->valor, $4);
     valor_t valor = valor_simples("with");
-    //valor.tipo_dado_inferido = $4;
+    valor.tipo_dado_inferido = $4;
     $$ = asd_create_and_add_2(valor, $2, $6);
 }
 Identificador: TK_ID {
+    // Complicado fazer ações semanticas aqui, pois n se sabe se esse ID é de uma declaração ou de um uso
     $$ = asd_new(*$1);
     free($1->lexema);
     free($1);
@@ -242,8 +250,8 @@ Atrib: Identificador TK_PR_IS Expressao {
     $$ = asd_create_and_add_2(valor, $1, $3);
 }
 Chama_func: Identificador '(' Lista_args ')' {
+    check_undeclared($1->valor.lexema);
     // alocar espaço pra "call $1->valor.lexema"
-   // realloc($1->valor.lexema, strlen("call ") + strlen($1->valor.lexema))
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
     strcpy(id_label, $1->valor.lexema);
     free($1->valor.lexema);
@@ -256,6 +264,7 @@ Chama_func: Identificador '(' Lista_args ')' {
     $$ = $1;
 }
 Chama_func: Identificador '(' ')' {
+    check_undeclared($1->valor.lexema);
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
     strcpy(id_label, $1->valor.lexema);
@@ -291,83 +300,106 @@ Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco {
     valor_t valor = valor_simples("while");
     $$ = asd_create_and_add_2(valor, $3, $5);
 }
-Expressao: Expressao '|' T7 {
+Expressao: T8 {
+    $$ = $1;
+}
+T8: T8 '|' T7 {
     valor_t valor = valor_simples("|");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
-Expressao: T7 {
+T8: T7 {
     $$ = $1;
 }
 T7: T7 '&' T6 {
     valor_t valor = valor_simples("&");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T7: T6 { $$ = $1; }
 T6: T6 TK_OC_EQ T5 {
     valor_t valor = valor_simples("==");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T6: T6 TK_OC_NE T5 { 
     valor_t valor = valor_simples("!=");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T6: T5 { $$ = $1; }
 T5: T5 TK_OC_GE T4 { 
     valor_t valor = valor_simples(">=");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T5: T5 TK_OC_LE T4 {
     valor_t valor = valor_simples("<=");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T5: T5 '<' T4 {
     valor_t valor = valor_simples("<");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T5: T5 '>' T4 {
     valor_t valor = valor_simples(">");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T5: T4 { $$ = $1; }
 T4: T4 '+' T3 { 
-    //printf("T4 + T3 -> T4\n");
     valor_t valor = valor_simples("+");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T4: T4 '-' T3 {
     valor_t valor = valor_simples("-");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T4: T3 { $$ = $1; }
 T3: T3 '*' T2 { 
     //printf("T3 * T2 -> T2\n");
     valor_t valor = valor_simples("*");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T3: T3 '/' T2  {
     valor_t valor = valor_simples("/");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T3: T3 '%' T2  {
     valor_t valor = valor_simples("%");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 T3: T2 { $$ = $1; }
 T2: '+' T2 {
     valor_t valor = valor_simples("+");
     $$ = asd_create_and_add_1(valor, $2);
+    $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
 }
 T2: '-' T2  {
     valor_t valor = valor_simples("-");
     $$ = asd_create_and_add_1(valor, $2);
+    $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
 }
 T2: '!' T2 {
     valor_t valor = valor_simples("!");
     $$ = asd_create_and_add_1(valor, $2);
+    $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
 }
 T2: T1 { $$ = $1; }
 T1: '(' Expressao ')' { $$ = $2; }
-T1: Identificador { $$ = $1; }
+T1: Identificador { 
+    // Aqui o Identificador está sendo usando em uma expressão
+    check_undeclared($1->valor.lexema);
+    set_tipo_da_tabela($1, $1->valor.lexema);
+    $$ = $1; 
+}
 T1: Literal { $$ = $1; }
 T1: Chama_func { $$ = $1; }
 %%

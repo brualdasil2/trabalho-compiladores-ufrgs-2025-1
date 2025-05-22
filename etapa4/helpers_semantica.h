@@ -2,12 +2,18 @@
 #define HELPERS_SEMANTICA_H
 #include "pilha_tabelas.h"
 #include "tabela_simbolos.h"
+#include "asd.h"
 #include "erros.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 void check_declared(char* identificador);
+void check_undeclared(char* identificador);
 
+void set_tipo_da_tabela(asd_tree_t* no, char* lexema);
+void inferencia_tipo_op_binaria(asd_tree_t* op, asd_tree_t* op1, asd_tree_t* op2);
 void insere_variavel_tabela(valor_t valor_original, tipo_dado_t tipo_dado);
+void insere_funcao_tabela(valor_t valor_original, tipo_dado_t tipo_dado);
 
 #endif // HELPERS_SEMANTICA_H

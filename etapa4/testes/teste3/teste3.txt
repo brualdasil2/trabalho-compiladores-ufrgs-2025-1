@@ -1,7 +1,16 @@
 declare x as float,
 declare xy as float,
+z returns int is [
+
+],
+a returns float with b as int is [
+
+],
 main returns int is [
     declare y as int
-    declare x as int with 3
+    //declare x as int with 3
+    y is z
     x is y
+    a()
+    x is x + xy
 ];
