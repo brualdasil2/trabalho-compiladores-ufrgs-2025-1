@@ -3,6 +3,8 @@
 #include "tabela_simbolos.h"
 #include "utils.h"
 
+#define PRINTS_DEUBG_PILHA 0
+
 typedef struct s_pilha_tabelas_t {
     tabela_simbolos_t** tabelas;
     size_t tamanho_usado;

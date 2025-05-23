@@ -64,6 +64,7 @@ asd_tree_t* func_atual = NULL;
 %type<tipo_dado> Tipo
 %type<no> Corpo_func
 %type<no> Comando
+%type<no> Bloco_func
 %type<no> Bloco
 %type<no> Lista_com
 %type<no> Dec_var
@@ -152,6 +153,8 @@ Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS {
     check_declared($1->valor.lexema);
     insere_funcao_tabela($1->valor, $3);
     func_atual = $1;
+    tabela_simbolos_t* tabela = init_tabela();
+    push_pilha_tabelas(tabela);
     // TODO: passar NULL como argumento da lista args
     $$ = $1;
 }
@@ -167,7 +170,8 @@ Parametro: Identificador TK_PR_AS Tipo {
 }
 Tipo: TK_PR_INT { $$ = $1; }
 Tipo: TK_PR_FLOAT { $$ = $1; }
-Corpo_func: Bloco {
+Corpo_func: Bloco_func {
+    pop_pilha_tabelas();
     $$ = $1;
 }
 Comando: Bloco { 
@@ -191,8 +195,21 @@ Comando: Retorno {
 Comando: Fluxo {
     $$ = $1;
 }
-Bloco: '[' Lista_com ']' { 
+Bloco_func: '[' Lista_com ']' { 
     $$ = $2;
+}
+Bloco_func: '[' ']' {
+    $$ = NULL;
+}
+Empilha_tabela: {
+    tabela_simbolos_t* tabela = init_tabela();
+    push_pilha_tabelas(tabela);
+}
+Desempilha_tabela: {
+    pop_pilha_tabelas();
+}
+Bloco: '[' Empilha_tabela Lista_com Desempilha_tabela ']' { 
+    $$ = $3;
 }
 Bloco: '[' ']' {
     $$ = NULL;

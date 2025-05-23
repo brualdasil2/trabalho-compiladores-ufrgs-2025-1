@@ -1,6 +1,7 @@
 #include "pilha_tabelas.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 pilha_tabelas_t pilha;
 
@@ -17,6 +18,8 @@ void push_pilha_tabelas(tabela_simbolos_t* tabela){
     }
     pilha.tabelas[pilha.tamanho_usado] = tabela;
     pilha.tamanho_usado++;
+    if (PRINTS_DEUBG_PILHA)
+        printf("PUSH pilha, novo tamanho = %lu\n", pilha.tamanho_usado);
 }
 
 status_t pop_pilha_tabelas(){
@@ -25,6 +28,8 @@ status_t pop_pilha_tabelas(){
     }
     free_tabela_simbolos(pilha.tabelas[pilha.tamanho_usado-1]);
     pilha.tamanho_usado--;
+    if (PRINTS_DEUBG_PILHA)
+        printf("POP pilha, novo tamanho = %lu", pilha.tamanho_usado);
     return STATUS_OK;
 }
 

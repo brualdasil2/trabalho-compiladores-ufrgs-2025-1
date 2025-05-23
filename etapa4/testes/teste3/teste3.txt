@@ -1,13 +1,14 @@
 declare x_f as float,
 declare xy_f as float,
+declare y_i as int,
 z_i returns int is [
     return 3 as int
 ],
 a_f returns float with b_i as int is [
-
+    declare y_i as int
 ],
 main returns int is [
-    declare y_i as int with 3
+    declare y_i as int
     y_i is z_i()
     x_f is xy_f
     x_f is x_f + a_f()

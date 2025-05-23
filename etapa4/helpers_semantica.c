@@ -4,6 +4,7 @@ void check_declared(char* identificador) {
     tabela_simbolos_t* tabela_atual = get_tabela_topo_pilha();
     item_tabela_t* item_existe = busca_item_tabela_simbolos(tabela_atual, identificador);
     if (item_existe != NULL) {
+        printf("Erro: variável %s, na linha %lu, já havia sido declarada\n", item_existe->chave, item_existe->linha_token);
         free_pilha_tabelas();
         exit(ERR_DECLARED);
     }
@@ -47,8 +48,8 @@ void check_is_func(char* identificador) {
 
 void inferencia_tipo_op_binaria(asd_tree_t* op, asd_tree_t* op1, asd_tree_t* op2) {
     if (op1->valor.tipo_dado_inferido != op2->valor.tipo_dado_inferido) {
-        free_pilha_tabelas();
         printf("Erro: tipo errrado entre \"%s\" e \"%s\" na linha %d\n", op1->valor.lexema, op2->valor.lexema, op1->valor.linha_token);
+        free_pilha_tabelas();
         exit(ERR_WRONG_TYPE);
     }
     //printf("\"%s\": tipo %d %s \"%s\": tipo %d\n", op1->valor.lexema, op1->valor.tipo_dado_inferido, op->valor.lexema, op2->valor.lexema, op2->valor.tipo_dado_inferido);
@@ -59,8 +60,8 @@ extern asd_tree_t* func_atual;
 
 void inferencia_tipo_return(asd_tree_t* retorno, asd_tree_t* exp, tipo_dado_t tipo_retorno) {
     if (exp->valor.tipo_dado_inferido != tipo_retorno) {
-        free_pilha_tabelas();
         printf("Erro: tipo incompatível de expressão e retorno na linha %d\n", exp->valor.linha_token);
+        free_pilha_tabelas();
         exit(ERR_WRONG_TYPE);
     }
     retorno->valor.tipo_dado_inferido = tipo_retorno;
@@ -70,8 +71,8 @@ void inferencia_tipo_return(asd_tree_t* retorno, asd_tree_t* exp, tipo_dado_t ti
         exit(1);
     }
     if (retorno->valor.tipo_dado_inferido != item_func->tipo_dado) {
-        free_pilha_tabelas();
         printf("Erro: tipo incompatível de retorno e função na linha %d\n", exp->valor.linha_token);
+        free_pilha_tabelas();
         exit(ERR_WRONG_TYPE);
     }
 }
