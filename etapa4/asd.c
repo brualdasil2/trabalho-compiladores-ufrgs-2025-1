@@ -51,6 +51,7 @@ asd_tree_t *asd_new(valor_t valor)
   asd_tree_t *ret = NULL;
   ret = calloc(1, sizeof(asd_tree_t));
   if (ret != NULL){
+    ret->valor = valor;
     ret->valor.lexema = strdup(valor.lexema);
     ret->number_of_children = 0;
     ret->children = NULL;

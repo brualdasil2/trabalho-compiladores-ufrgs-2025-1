@@ -15,6 +15,7 @@ void yyerror (char const *mensagem);
 int get_line_number();
 
 extern asd_tree_t *arvore;
+asd_tree_t* func_atual = NULL;
 %}
 
 // Onde valor_t é alocado? No scanner.l!!
@@ -135,16 +136,19 @@ Def_func: Cab_func Corpo_func {
     if ($2 != NULL) {
         asd_add_child($1, $2);    
     }
+    func_atual = NULL;
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS { 
     check_declared($1->valor.lexema);
     insere_funcao_tabela($1->valor, $3);
+    func_atual = $1;
     // TODO: criar lista encadeada de args, extrair ela do $5 e passar junto pra insere_func_tab, que vai converter de lista enc de args pra array de args, inserir na tabela e dar free da lista enc
     $$ = $1;
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { 
     check_declared($1->valor.lexema);
     insere_funcao_tabela($1->valor, $3);
+    func_atual = $1;
     // TODO: passar NULL como argumento da lista args
     $$ = $1;
 }
@@ -227,7 +231,10 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
     insere_variavel_tabela($2->valor, $4);
     valor_t valor = valor_simples("with");
     valor.tipo_dado_inferido = $4;
+    $2->valor.tipo_dado_inferido = $4;
+    insere_literal_tabela($6->valor, $6->valor.tipo_dado_inferido);
     $$ = asd_create_and_add_2(valor, $2, $6);
+    inferencia_tipo_op_binaria($$, $2, $6);
 }
 Identificador: TK_ID {
     // Complicado fazer ações semanticas aqui, pois n se sabe se esse ID é de uma declaração ou de um uso
@@ -248,9 +255,14 @@ Literal: TK_LI_FLOAT {
 Atrib: Identificador TK_PR_IS Expressao { 
     valor_t valor = valor_simples("is");
     $$ = asd_create_and_add_2(valor, $1, $3);
+    set_tipo_da_tabela($1, $1->valor.lexema);
+    inferencia_tipo_op_binaria($$, $1, $3);
 }
 Chama_func: Identificador '(' Lista_args ')' {
     check_undeclared($1->valor.lexema);
+    check_is_func($1->valor.lexema);
+    set_tipo_da_tabela($1, $1->valor.lexema);
+    // TODO: check lista args corresponde à tabela
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
     strcpy(id_label, $1->valor.lexema);
@@ -265,6 +277,9 @@ Chama_func: Identificador '(' Lista_args ')' {
 }
 Chama_func: Identificador '(' ')' {
     check_undeclared($1->valor.lexema);
+    check_is_func($1->valor.lexema);
+    set_tipo_da_tabela($1, $1->valor.lexema);
+    // TODO: check lista args corresponde à tabela
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
     strcpy(id_label, $1->valor.lexema);
@@ -285,20 +300,24 @@ Arg: Expressao { $$ = $1; }
 Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo {
     valor_t valor = valor_simples("return");
     $$ = asd_create_and_add_1(valor, $2);
+    inferencia_tipo_return($$, $2, $4);
 }
 Fluxo: Fluxo_cond { $$ = $1; }
 Fluxo: Fluxo_iter { $$ = $1; }
 Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco {
     valor_t valor = valor_simples("if");
     $$ = asd_create_and_add_2(valor, $3, $5);
+    $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
 }
 Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco {
     valor_t valor = valor_simples("if");
     $$ = asd_create_and_add_3(valor, $3, $5, $7);
+    $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
 }
 Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco {
     valor_t valor = valor_simples("while");
     $$ = asd_create_and_add_2(valor, $3, $5);
+    $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
 }
 Expressao: T8 {
     $$ = $1;
@@ -397,11 +416,17 @@ T1: '(' Expressao ')' { $$ = $2; }
 T1: Identificador { 
     // Aqui o Identificador está sendo usando em uma expressão
     check_undeclared($1->valor.lexema);
+    check_is_var($1->valor.lexema);
     set_tipo_da_tabela($1, $1->valor.lexema);
     $$ = $1; 
 }
-T1: Literal { $$ = $1; }
-T1: Chama_func { $$ = $1; }
+T1: Literal { 
+    insere_literal_tabela($1->valor, $1->valor.tipo_dado_inferido);
+    $$ = $1;
+}
+T1: Chama_func { 
+    $$ = $1; 
+}
 %%
 
 void yyerror (char const *mensagem) {
