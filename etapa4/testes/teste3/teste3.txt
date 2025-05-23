@@ -4,13 +4,14 @@ declare y_i as int,
 z_i returns int is [
     return 3 as int
 ],
-a_f returns float with b_i as int is [
+a_f returns float with b_f as float, c_f as float, d_f as float is [
     declare y_i as int
-    declare b_i as int
+    return c_f + b_f as float
 ],
 main returns int is [
     declare y_i as int
+    declare j_f as float
     y_i is z_i()
     x_f is xy_f
-    x_f is x_f + a_f()
+    x_f is x_f + a_f(x_f + x_f, j_f, xy_f)
 ];

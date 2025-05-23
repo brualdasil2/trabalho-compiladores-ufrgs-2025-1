@@ -46,6 +46,40 @@ void check_is_func(char* identificador) {
 
 }
 
+extern array_argumento_t args_atual;
+
+void check_args(char* identificador) {
+    item_tabela_t* item = buscar_item_pilha_tabelas(identificador);
+    if (item == NULL) {
+        printf("Deu ruim\n");
+        exit(1);
+    }
+    int n_args_func = item->argumentos.tamanho_usado;
+    int n_args_chamada = args_atual.tamanho_usado;
+    if (n_args_chamada < n_args_func) {
+        printf("Erro: faltando argumentos na chamada da função %s na linha %lu\n", identificador, item->linha_token);
+        free_array_argumento(&args_atual);
+        free_pilha_tabelas();
+        exit(ERR_MISSING_ARGS);
+    }
+    if (n_args_chamada > n_args_func) {
+        printf("Erro: muitos argumentos na chamada da função %s na linha %lu\n", identificador, item->linha_token);
+        free_array_argumento(&args_atual);
+        free_pilha_tabelas();
+        exit(ERR_EXCESS_ARGS);
+    }
+    for (int i = 0; i < n_args_func; i++) {
+        if (item->argumentos.itens[i].tipo_dado != args_atual.itens[n_args_chamada-i-1].tipo_dado) {
+            printf("Erro: tipos incompatíveis na chamada da função %s na linha %lu\n", identificador, item->linha_token);
+            free_array_argumento(&args_atual);
+            free_pilha_tabelas();
+            exit(ERR_WRONG_TYPE_ARGS);
+        }
+    }
+    args_atual.tamanho_usado = 0;
+    free_array_argumento(&args_atual);
+}
+
 void insere_params_func_tabela(char* identificador, asd_tree_t* lista_params) {
     item_tabela_t* item_func = buscar_item_pilha_tabelas(identificador);
     while (lista_params != NULL) {

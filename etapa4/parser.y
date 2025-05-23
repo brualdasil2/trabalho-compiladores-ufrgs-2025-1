@@ -16,6 +16,8 @@ int get_line_number();
 
 extern asd_tree_t *arvore;
 asd_tree_t* func_atual = NULL;
+array_argumento_t args_atual;
+
 %}
 
 // Onde valor_t é alocado? No scanner.l!!
@@ -284,7 +286,7 @@ Chama_func: Identificador '(' Lista_args ')' {
     check_undeclared($1->valor.lexema);
     check_is_func($1->valor.lexema);
     set_tipo_da_tabela($1, $1->valor.lexema);
-    // TODO: check lista args corresponde à tabela
+    check_args($1->valor.lexema);
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
     strcpy(id_label, $1->valor.lexema);
@@ -301,6 +303,7 @@ Chama_func: Identificador '(' ')' {
     check_undeclared($1->valor.lexema);
     check_is_func($1->valor.lexema);
     set_tipo_da_tabela($1, $1->valor.lexema);
+    check_args($1->valor.lexema);
     // TODO: check lista args corresponde à tabela
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
@@ -314,10 +317,17 @@ Chama_func: Identificador '(' ')' {
     $$ = $1;
 }
 Lista_args: Arg ',' Lista_args {
+    argumento_t arg = { $1->valor.tipo_dado_inferido };
+    insere_item_array_argumento(&args_atual, arg);
     asd_add_child($1, $3);
     $$ = $1;
 }
-Lista_args: Arg { $$ = $1; }
+Lista_args: Arg { 
+    init_array_argumento(&args_atual);
+    argumento_t arg = { $1->valor.tipo_dado_inferido };
+    insere_item_array_argumento(&args_atual, arg);
+    $$ = $1;
+}
 Arg: Expressao { $$ = $1; }
 Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo {
     valor_t valor = valor_simples("return");
