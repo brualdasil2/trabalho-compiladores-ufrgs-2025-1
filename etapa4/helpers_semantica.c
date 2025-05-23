@@ -1,7 +1,8 @@
 #include "helpers_semantica.h"
 
 void check_declared(char* identificador) {
-    item_tabela_t* item_existe = buscar_item_pilha_tabelas(identificador);
+    tabela_simbolos_t* tabela_atual = get_tabela_topo_pilha();
+    item_tabela_t* item_existe = busca_item_tabela_simbolos(tabela_atual, identificador);
     if (item_existe != NULL) {
         free_pilha_tabelas();
         exit(ERR_DECLARED);

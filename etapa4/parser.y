@@ -142,7 +142,10 @@ Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS {
     check_declared($1->valor.lexema);
     insere_funcao_tabela($1->valor, $3);
     func_atual = $1;
+    tabela_simbolos_t* tabela = init_tabela();
+    push_pilha_tabelas(tabela);
     // TODO: criar lista encadeada de args, extrair ela do $5 e passar junto pra insere_func_tab, que vai converter de lista enc de args pra array de args, inserir na tabela e dar free da lista enc
+    // TODO: inserir args locais da função na tabela
     $$ = $1;
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { 
