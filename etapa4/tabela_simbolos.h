@@ -6,6 +6,7 @@
 
 typedef enum { NAT_LITERAL, NAT_IDENTIFICADOR, NAT_FUNCAO } natureza_t;
 
+#define PRINTS_DEBUG_TABELA 0
 
 typedef struct s_item_tabela_t {
     char* chave;

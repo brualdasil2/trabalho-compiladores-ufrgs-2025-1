@@ -1,6 +1,7 @@
 #include "tabela_simbolos.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 tabela_simbolos_t* init_tabela() {
     tabela_simbolos_t* tabela = (tabela_simbolos_t*) malloc(sizeof(tabela_simbolos_t));
@@ -17,6 +18,8 @@ void insere_item_tabela_simbolos(tabela_simbolos_t* tabela, item_tabela_t item) 
     }
     tabela->itens[tabela->tamanho_usado] = item;
     tabela->tamanho_usado++;
+    if (PRINTS_DEBUG_TABELA)
+        printf("Inseriu item %s na tabela, novo tam = %lu\n", item.chave, tabela->tamanho_usado);
 }
 
 item_tabela_t* busca_item_tabela_simbolos(tabela_simbolos_t* tabela, char* chave) {

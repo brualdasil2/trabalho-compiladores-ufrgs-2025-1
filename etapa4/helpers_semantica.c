@@ -46,6 +46,24 @@ void check_is_func(char* identificador) {
 
 }
 
+void insere_params_func_tabela(char* identificador, asd_tree_t* lista_params) {
+    item_tabela_t* item_func = buscar_item_pilha_tabelas(identificador);
+    while (lista_params != NULL) {
+        // Insere param como var local na tabela da func
+        check_declared(lista_params->valor.lexema);
+        insere_variavel_tabela(lista_params->valor, lista_params->valor.tipo_dado_inferido);
+        // Insere param na lista de argumentos da func na tabela, pra poder checar dps se chamadas tão certas
+        argumento_t arg;
+        arg.tipo_dado = lista_params->valor.tipo_dado_inferido;
+        insere_item_array_argumento(&(item_func->argumentos), arg);
+        // Prox param
+        if (lista_params->number_of_children == 0)
+            lista_params = NULL;
+        else
+            lista_params = lista_params->children[0];
+    }
+}
+
 void inferencia_tipo_op_binaria(asd_tree_t* op, asd_tree_t* op1, asd_tree_t* op2) {
     if (op1->valor.tipo_dado_inferido != op2->valor.tipo_dado_inferido) {
         printf("Erro: tipo errrado entre \"%s\" e \"%s\" na linha %d\n", op1->valor.lexema, op2->valor.lexema, op1->valor.linha_token);

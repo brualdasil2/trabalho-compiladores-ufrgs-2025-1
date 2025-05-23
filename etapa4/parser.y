@@ -145,8 +145,8 @@ Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS {
     func_atual = $1;
     tabela_simbolos_t* tabela = init_tabela();
     push_pilha_tabelas(tabela);
-    // TODO: criar lista encadeada de args, extrair ela do $5 e passar junto pra insere_func_tab, que vai converter de lista enc de args pra array de args, inserir na tabela e dar free da lista enc
-    // TODO: inserir args locais da função na tabela
+    insere_params_func_tabela($1->valor.lexema, $5);
+    asd_free($5);
     $$ = $1;
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { 
@@ -155,17 +155,19 @@ Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS {
     func_atual = $1;
     tabela_simbolos_t* tabela = init_tabela();
     push_pilha_tabelas(tabela);
-    // TODO: passar NULL como argumento da lista args
     $$ = $1;
 }
 Lista_params: Parametro ',' Lista_params {
-    $$ = NULL;
+    asd_add_child($1, $3);
+    $$ = $1;
 }
 Lista_params: Parametro {
-    $$ = NULL;
+    $$ = $1;
 }
 Parametro: Identificador TK_PR_AS Tipo { 
-    $$ = NULL;
+    valor_t valor_param = $1->valor;
+    valor_param.tipo_dado_inferido = $3;
+    $$ = asd_new(valor_param);
     asd_free($1);
 }
 Tipo: TK_PR_INT { $$ = $1; }

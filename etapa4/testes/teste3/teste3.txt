@@ -6,6 +6,7 @@ z_i returns int is [
 ],
 a_f returns float with b_i as int is [
     declare y_i as int
+    declare b_i as int
 ],
 main returns int is [
     declare y_i as int
