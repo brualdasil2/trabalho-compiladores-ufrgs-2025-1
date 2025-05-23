@@ -142,7 +142,7 @@ Def_func: Cab_func Corpo_func {
     func_atual = NULL;
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS { 
-    check_declared($1->valor.lexema);
+    check_declared($1);
     insere_funcao_tabela($1->valor, $3);
     func_atual = $1;
     tabela_simbolos_t* tabela = init_tabela();
@@ -152,7 +152,7 @@ Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS {
     $$ = $1;
 }
 Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS { 
-    check_declared($1->valor.lexema);
+    check_declared($1);
     insere_funcao_tabela($1->valor, $3);
     func_atual = $1;
     tabela_simbolos_t* tabela = init_tabela();
@@ -240,7 +240,7 @@ Lista_com: Comando {
     $$ = $1;
 }
 Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo { 
-    check_declared($2->valor.lexema);
+    check_declared($2);
     insere_variavel_tabela($2->valor, $4);
 
     $$ = NULL;
@@ -251,7 +251,7 @@ Dec_var_com: Dec_var {
     $$ = NULL;
 }
 Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal { 
-    check_declared($2->valor.lexema);
+    check_declared($2);
     insere_variavel_tabela($2->valor, $4);
     valor_t valor = valor_simples("with");
     valor.tipo_dado_inferido = $4;
@@ -283,10 +283,10 @@ Atrib: Identificador TK_PR_IS Expressao {
     inferencia_tipo_op_binaria($$, $1, $3);
 }
 Chama_func: Identificador '(' Lista_args ')' {
-    check_undeclared($1->valor.lexema);
-    check_is_func($1->valor.lexema);
+    check_undeclared($1);
+    check_is_func($1);
     set_tipo_da_tabela($1, $1->valor.lexema);
-    check_args($1->valor.lexema);
+    check_args($1);
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
     strcpy(id_label, $1->valor.lexema);
@@ -300,10 +300,10 @@ Chama_func: Identificador '(' Lista_args ')' {
     $$ = $1;
 }
 Chama_func: Identificador '(' ')' {
-    check_undeclared($1->valor.lexema);
-    check_is_func($1->valor.lexema);
+    check_undeclared($1);
+    check_is_func($1);
     set_tipo_da_tabela($1, $1->valor.lexema);
-    check_args($1->valor.lexema);
+    check_args($1);
     // TODO: check lista args corresponde à tabela
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
@@ -447,9 +447,10 @@ T2: T1 { $$ = $1; }
 T1: '(' Expressao ')' { $$ = $2; }
 T1: Identificador { 
     // Aqui o Identificador está sendo usando em uma expressão
-    check_undeclared($1->valor.lexema);
-    check_is_var($1->valor.lexema);
+    check_undeclared($1);
+    check_is_var($1);
     set_tipo_da_tabela($1, $1->valor.lexema);
+    //printf("Identiicador em exp: %s: %d\n", $1->valor.lexema, $1->valor.linha_token);
     $$ = $1; 
 }
 T1: Literal { 
@@ -462,5 +463,5 @@ T1: Chama_func {
 %%
 
 void yyerror (char const *mensagem) {
-    printf("Na linha %d, houve erro [ %s ]\n", get_line_number(), mensagem);
+    printf("Erro sintático: na linha %d, houve erro [ %s ]\n", get_line_number(), mensagem);
 }

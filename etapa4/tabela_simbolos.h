@@ -13,7 +13,7 @@ typedef struct s_item_tabela_t {
     natureza_t natureza;
     tipo_dado_t tipo_dado;
     array_argumento_t argumentos;
-    size_t linha_token;
+    int linha_token;
 } item_tabela_t;
 
 typedef struct s_tabela_simbolos_t {

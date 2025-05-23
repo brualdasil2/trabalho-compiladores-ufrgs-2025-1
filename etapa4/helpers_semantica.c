@@ -1,55 +1,56 @@
 #include "helpers_semantica.h"
 
-void check_declared(char* identificador) {
+void check_declared(asd_tree_t* node) {
     tabela_simbolos_t* tabela_atual = get_tabela_topo_pilha();
-    item_tabela_t* item_existe = busca_item_tabela_simbolos(tabela_atual, identificador);
+    item_tabela_t* item_existe = busca_item_tabela_simbolos(tabela_atual, node->valor.lexema);
     if (item_existe != NULL) {
-        printf("Erro: variável %s, na linha %lu, já havia sido declarada\n", item_existe->chave, item_existe->linha_token);
+        printf("Erro semântico: variável %s, na linha %d, já havia sido declarada na linha %d\n", item_existe->chave, node->valor.linha_token, item_existe->linha_token);
         free_pilha_tabelas();
         exit(ERR_DECLARED);
     }
 }
 
-void check_undeclared(char* identificador) {
-    item_tabela_t* item_existe = buscar_item_pilha_tabelas(identificador);
+void check_undeclared(asd_tree_t* node) {
+    item_tabela_t* item_existe = buscar_item_pilha_tabelas(node->valor.lexema);
     if (item_existe == NULL) {
+        printf("Erro semântico: variável %s, na linha %d, não delcarada", node->valor.lexema, node->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_UNDECLARED);
     }
 }
 
-void check_is_var(char* identificador) {
-    item_tabela_t* item = buscar_item_pilha_tabelas(identificador);
+void check_is_var(asd_tree_t* node) {
+    item_tabela_t* item = buscar_item_pilha_tabelas(node->valor.lexema);
     // Aqui item não é NULL
     if (item == NULL) {
         printf("Deu ruim\n");
         exit(1);
     }
     if (item->natureza == NAT_FUNCAO) {
+        printf("Erro semântico: função %s, na linha %d, usada como variável", node->valor.lexema, node->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_FUNCTION);
     }
-
 }
 
-void check_is_func(char* identificador) {
-    item_tabela_t* item = buscar_item_pilha_tabelas(identificador);
+void check_is_func(asd_tree_t* node) {
+    item_tabela_t* item = buscar_item_pilha_tabelas(node->valor.lexema);
     // Aqui item não é NULL
     if (item == NULL) {
         printf("Deu ruim\n");
         exit(1);
     }
     if (item->natureza == NAT_IDENTIFICADOR) {
+        printf("Erro semântico: variável %s, na linha %d, usada como função", node->valor.lexema, node->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_VARIABLE);
     }
-
 }
 
 extern array_argumento_t args_atual;
 
-void check_args(char* identificador) {
-    item_tabela_t* item = buscar_item_pilha_tabelas(identificador);
+void check_args(asd_tree_t* node) {
+    item_tabela_t* item = buscar_item_pilha_tabelas(node->valor.lexema);
     if (item == NULL) {
         printf("Deu ruim\n");
         exit(1);
@@ -57,20 +58,20 @@ void check_args(char* identificador) {
     int n_args_func = item->argumentos.tamanho_usado;
     int n_args_chamada = args_atual.tamanho_usado;
     if (n_args_chamada < n_args_func) {
-        printf("Erro: faltando argumentos na chamada da função %s na linha %lu\n", identificador, item->linha_token);
+        printf("Erro semântico: faltando argumentos na chamada da função %s na linha %d\n", node->valor.lexema, node->valor.linha_token);
         free_array_argumento(&args_atual);
         free_pilha_tabelas();
         exit(ERR_MISSING_ARGS);
     }
     if (n_args_chamada > n_args_func) {
-        printf("Erro: muitos argumentos na chamada da função %s na linha %lu\n", identificador, item->linha_token);
+        printf("Erro semântico: muitos argumentos na chamada da função %s na linha %d\n", node->valor.lexema, node->valor.linha_token);
         free_array_argumento(&args_atual);
         free_pilha_tabelas();
         exit(ERR_EXCESS_ARGS);
     }
     for (int i = 0; i < n_args_func; i++) {
         if (item->argumentos.itens[i].tipo_dado != args_atual.itens[n_args_chamada-i-1].tipo_dado) {
-            printf("Erro: tipos incompatíveis na chamada da função %s na linha %lu\n", identificador, item->linha_token);
+            printf("Erro semântico: tipos incompatíveis na chamada da função %s na linha %d\n", node->valor.lexema, node->valor.linha_token);
             free_array_argumento(&args_atual);
             free_pilha_tabelas();
             exit(ERR_WRONG_TYPE_ARGS);
@@ -84,7 +85,7 @@ void insere_params_func_tabela(char* identificador, asd_tree_t* lista_params) {
     item_tabela_t* item_func = buscar_item_pilha_tabelas(identificador);
     while (lista_params != NULL) {
         // Insere param como var local na tabela da func
-        check_declared(lista_params->valor.lexema);
+        check_declared(lista_params);
         insere_variavel_tabela(lista_params->valor, lista_params->valor.tipo_dado_inferido);
         // Insere param na lista de argumentos da func na tabela, pra poder checar dps se chamadas tão certas
         argumento_t arg;
@@ -100,11 +101,10 @@ void insere_params_func_tabela(char* identificador, asd_tree_t* lista_params) {
 
 void inferencia_tipo_op_binaria(asd_tree_t* op, asd_tree_t* op1, asd_tree_t* op2) {
     if (op1->valor.tipo_dado_inferido != op2->valor.tipo_dado_inferido) {
-        printf("Erro: tipo errrado entre \"%s\" e \"%s\" na linha %d\n", op1->valor.lexema, op2->valor.lexema, op1->valor.linha_token);
+        printf("Erro semântico: tipo errrado entre \"%s\" e \"%s\" na linha %d\n", op1->valor.lexema, op2->valor.lexema, op1->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_WRONG_TYPE);
     }
-    //printf("\"%s\": tipo %d %s \"%s\": tipo %d\n", op1->valor.lexema, op1->valor.tipo_dado_inferido, op->valor.lexema, op2->valor.lexema, op2->valor.tipo_dado_inferido);
     op->valor.tipo_dado_inferido = op1->valor.tipo_dado_inferido;
 }
 
@@ -112,7 +112,7 @@ extern asd_tree_t* func_atual;
 
 void inferencia_tipo_return(asd_tree_t* retorno, asd_tree_t* exp, tipo_dado_t tipo_retorno) {
     if (exp->valor.tipo_dado_inferido != tipo_retorno) {
-        printf("Erro: tipo incompatível de expressão e retorno na linha %d\n", exp->valor.linha_token);
+        printf("Erro semântico: tipo incompatível de expressão e retorno na linha %d\n", exp->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_WRONG_TYPE);
     }
@@ -123,7 +123,7 @@ void inferencia_tipo_return(asd_tree_t* retorno, asd_tree_t* exp, tipo_dado_t ti
         exit(1);
     }
     if (retorno->valor.tipo_dado_inferido != item_func->tipo_dado) {
-        printf("Erro: tipo incompatível de retorno e função na linha %d\n", exp->valor.linha_token);
+        printf("Erro semântico: tipo incompatível de retorno e função na linha %d\n", exp->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_WRONG_TYPE);
     }
