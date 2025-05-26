@@ -1,0 +1,59 @@
+declare global as int,
+func1 returns int with x as int, y as int, z as float is [],
+
+func2 returns int is [return 321 as int],
+
+rec returns int with param as int is
+[
+if (param > global) [return param*global as int] 
+else [rec(param*2)]
+],
+
+//declare global as int // TESTER
+main returns int is
+[
+declare local as float with .123
+global is 21
+
+if (1 > 1) [
+]
+else [
+]
+
+func1(+++1, !!!3, 2.2 + .3)
+func2()
+//declare local as float with .123 // TESTER
+
+if (1 + 2 == 3)
+[
+declare var1 as float
+declare global as int // nao deve dar dupla declaracao pois eh dentro de um escopo aninhado
+var1 is local + 1.1
+]
+else
+[
+declare var2 as float
+declare local as float with 5.5 // nao deve dar dupla declaracao pois eh dentro de um escopo aninhado
+var2 is local - 2.2
+]
+
+rec(1)
+
+//rec(fake) // var nao declarada
+
+//local is 123 // wrong type
+//global is 0.3 // wrong type
+
+//declare local as int with 1234 // dupla declare
+
+//return 2.2 as int // return com cast implicito (erro)
+//return 2.2 as float // return de tipo errado
+
+// chamadas de funcao
+//func1(1,2) // falta args
+//func1(1,2,3) // tipo errado de args
+//func1(1,2,3,4) // muitos args
+func1(1,global,local) // ok
+
+return -(1+2-func2())%3 as int
+];

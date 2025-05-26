@@ -13,7 +13,7 @@ void check_declared(asd_tree_t* node) {
 void check_undeclared(asd_tree_t* node) {
     item_tabela_t* item_existe = buscar_item_pilha_tabelas(node->valor.lexema);
     if (item_existe == NULL) {
-        printf("Erro semântico: variável %s, na linha %d, não delcarada", node->valor.lexema, node->valor.linha_token);
+        printf("Erro semântico: variável %s, na linha %d, não delcarada\n", node->valor.lexema, node->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_UNDECLARED);
     }
@@ -27,7 +27,7 @@ void check_is_var(asd_tree_t* node) {
         exit(1);
     }
     if (item->natureza == NAT_FUNCAO) {
-        printf("Erro semântico: função %s, na linha %d, usada como variável", node->valor.lexema, node->valor.linha_token);
+        printf("Erro semântico: função %s, na linha %d, usada como variável\n", node->valor.lexema, node->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_FUNCTION);
     }
@@ -41,7 +41,7 @@ void check_is_func(asd_tree_t* node) {
         exit(1);
     }
     if (item->natureza == NAT_IDENTIFICADOR) {
-        printf("Erro semântico: variável %s, na linha %d, usada como função", node->valor.lexema, node->valor.linha_token);
+        printf("Erro semântico: variável %s, na linha %d, usada como função\n", node->valor.lexema, node->valor.linha_token);
         free_pilha_tabelas();
         exit(ERR_VARIABLE);
     }
@@ -79,6 +79,17 @@ void check_args(asd_tree_t* node) {
     }
     args_atual.tamanho_usado = 0;
     free_array_argumento(&args_atual);
+}
+
+void check_if_else(asd_tree_t* bloco_true, asd_tree_t* bloco_false) {
+    if (bloco_true == NULL || bloco_false == NULL) {
+        return;
+    }
+    if (bloco_true->valor.tipo_dado_inferido != bloco_false->valor.tipo_dado_inferido) {
+        printf("Erro semântico: tipo errrado entre blocos do if-else nas linhas %d e %d\n", bloco_true->valor.linha_token, bloco_false->valor.linha_token);
+        free_pilha_tabelas();
+        exit(ERR_WRONG_TYPE);
+    }
 }
 
 void insere_params_func_tabela(char* identificador, asd_tree_t* lista_params) {

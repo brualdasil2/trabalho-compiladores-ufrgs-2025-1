@@ -255,6 +255,7 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
     insere_variavel_tabela($2->valor, $4);
     valor_t valor = valor_simples("with");
     valor.tipo_dado_inferido = $4;
+    valor.linha_token = $2->valor.linha_token;
     $2->valor.tipo_dado_inferido = $4;
     insere_literal_tabela($6->valor, $6->valor.tipo_dado_inferido);
     $$ = asd_create_and_add_2(valor, $2, $6);
@@ -304,7 +305,6 @@ Chama_func: Identificador '(' ')' {
     check_is_func($1);
     set_tipo_da_tabela($1, $1->valor.lexema);
     check_args($1);
-    // TODO: check lista args corresponde à tabela
     // alocar espaço pra "call $1->valor.lexema"
     char* id_label = (char*) malloc(strlen($1->valor.lexema) + 1);
     strcpy(id_label, $1->valor.lexema);
@@ -342,6 +342,7 @@ Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco {
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
 }
 Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco {
+    check_if_else($5, $7);
     valor_t valor = valor_simples("if");
     $$ = asd_create_and_add_3(valor, $3, $5, $7);
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
@@ -412,7 +413,6 @@ T4: T4 '-' T3 {
 }
 T4: T3 { $$ = $1; }
 T3: T3 '*' T2 { 
-    //printf("T3 * T2 -> T2\n");
     valor_t valor = valor_simples("*");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
@@ -450,7 +450,6 @@ T1: Identificador {
     check_undeclared($1);
     check_is_var($1);
     set_tipo_da_tabela($1, $1->valor.lexema);
-    //printf("Identiicador em exp: %s: %d\n", $1->valor.lexema, $1->valor.linha_token);
     $$ = $1; 
 }
 T1: Literal { 

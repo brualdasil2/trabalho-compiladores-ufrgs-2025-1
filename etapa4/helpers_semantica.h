@@ -13,6 +13,7 @@ void check_undeclared(asd_tree_t* node);
 void check_is_var(asd_tree_t* node);
 void check_is_func(asd_tree_t* node);
 void check_args(asd_tree_t* node);
+void check_if_else(asd_tree_t* bloco_true, asd_tree_t* bloco_false);
 
 void set_tipo_da_tabela(asd_tree_t* no, char* lexema);
 void inferencia_tipo_op_binaria(asd_tree_t* op, asd_tree_t* op1, asd_tree_t* op2);
