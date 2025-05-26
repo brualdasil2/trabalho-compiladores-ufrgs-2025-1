@@ -17,5 +17,9 @@ void insere_item_array_argumento(array_argumento_t* array, argumento_t item) {
     array->tamanho_usado++;
 }
 void free_array_argumento(array_argumento_t* array) {
-    free(array->itens);
+    if (array->tamanho_total > 0) {
+        free(array->itens);
+        array->tamanho_total = 0;
+        array->tamanho_usado = 0;
+    }
 }

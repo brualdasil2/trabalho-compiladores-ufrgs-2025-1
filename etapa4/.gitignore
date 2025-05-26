@@ -1,6 +1,6 @@
 *.o
 lex.yy.c
-etapa3
+etapa4
 parser.tab.c
 parser.tab.h
 .vscode
