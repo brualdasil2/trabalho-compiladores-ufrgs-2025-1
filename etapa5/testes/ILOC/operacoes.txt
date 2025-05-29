@@ -51,9 +51,26 @@ ILOC:
     // resultado em t3
 
 
+Código fonte:
+    if (t1) bloco_true else bloco_false
+ILOC:
+    exp.code
+    cbr t1 -> LT, LF
+    LT: nop
+    bloco_true.code
+    jumpI -> LS
+    LF: nop
+    bloco_false.code
+    LS: nop
 
-
-
+Código fonte:
+    if (t1) bloco_true
+ILOC:
+    exp.code
+    cbr t1 -> LT, LF
+    LT: nop
+    bloco_true.code
+    LF: nop
 
 
 ## Dúvidas

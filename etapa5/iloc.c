@@ -17,7 +17,7 @@ void set_operando_int(operando_iloc_t* operando, int valor) {
 }
 op_iloc_t init_op_iloc() {
     op_iloc_t op;
-    strcpy(op.mnemonico.valor, "");
+    strcpy(op.mnemonico.valor, "nop");
     strcpy(op.op1.valor, "");
     strcpy(op.op2.valor, "");
     strcpy(op.op3.valor, "");
@@ -39,6 +39,21 @@ op_iloc_t init_op_3(char* mnemonico, operando_iloc_t op1, operando_iloc_t op2) {
     strcpy(op.op2.valor, op2.valor);
     gera_temp(&op.op3);
     return op;
+}
+op_iloc_t init_op_cbr(operando_iloc_t test, rotulo_iloc_t rot_true, rotulo_iloc_t rot_false) {
+    op_iloc_t op = init_op_iloc();
+    strcpy(op.mnemonico.valor, "cbr");
+    strcpy(op.op1.valor, test.valor);
+    strcpy(op.op2.valor, rot_true.valor);
+    strcpy(op.op3.valor, rot_false.valor);
+    return op;
+}
+op_iloc_t init_op_jump(rotulo_iloc_t rot) {
+    op_iloc_t op = init_op_iloc();
+    strcpy(op.mnemonico.valor, "jumpI");
+    strcpy(op.op1.valor, rot.valor);
+    return op;
+
 }
 void init_array_op_iloc(array_op_iloc_t* array) {
     array->ops = (op_iloc_t*) malloc(DELTA_TAM*sizeof(op_iloc_t));
@@ -75,8 +90,15 @@ void print_array_op_iloc(array_op_iloc_t array) {
         else {
             printf("%s: %s ", op.rotulo.valor, op.mnemonico.valor);
         }
-        if (!strcmp(op.mnemonico.valor, "cbr")) {
-            printf("%s => %s, %s\n", op.op1.valor, op.op2.valor, op.op3.valor);
+
+        if (!strcmp(op.mnemonico.valor, "nop")) {
+            printf("\n");
+        }
+        else if (!strcmp(op.mnemonico.valor, "cbr")) {
+            printf("%s -> %s, %s\n", op.op1.valor, op.op2.valor, op.op3.valor);
+        }
+        else if (!strcmp(op.mnemonico.valor, "jumpI")) {
+            printf("-> %s\n", op.op1.valor);
         }
         else if (strlen(op.op2.valor) == 0) {
             // só tem um operando, logo fica à direita da seta

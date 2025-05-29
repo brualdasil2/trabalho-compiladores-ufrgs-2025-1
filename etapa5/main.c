@@ -11,6 +11,8 @@ void test_iloc() {
   int offset_y = 4;
   int offset_z = 8;
   int offset_lit_3 = 12;
+  int offset_a = 16;
+  int offset_b = 20;
 
   // x
   operando_iloc_t temp_x;
@@ -66,16 +68,49 @@ void test_iloc() {
   temp_3 = op_load_3.op3;
 
   // z * (x + y) > 3
-  operando_iloc_t temp_ge;
-  array_op_iloc_t code_ge;
-  init_array_op_iloc(&code_ge);
-  op_iloc_t op_ge = init_op_3("cmp_LT", temp_mult, temp_3);
-  append_array_op_iloc(&code_ge, &code_mult);
-  append_array_op_iloc(&code_ge, &code_3);
-  insere_item_array_op_iloc(&code_ge, op_ge);
+  operando_iloc_t temp_gt;
+  array_op_iloc_t code_gt;
+  init_array_op_iloc(&code_gt);
+  op_iloc_t op_gt = init_op_3("cmp_GT", temp_mult, temp_3);
+  append_array_op_iloc(&code_gt, &code_mult);
+  append_array_op_iloc(&code_gt, &code_3);
+  insere_item_array_op_iloc(&code_gt, op_gt);
 
-  print_array_op_iloc(code_ge);
-  free_array_op_iloc(&code_ge);
+  // bloco_true
+  array_op_iloc_t code_bloco_true;
+  init_array_op_iloc(&code_bloco_true);
+  op_iloc_t op_load_a = init_op_load_var(offset_a);
+  insere_item_array_op_iloc(&code_bloco_true, op_load_a);
+  temp_gt = op_gt.op3;
+
+  // bloco_false
+  array_op_iloc_t code_bloco_false;
+  init_array_op_iloc(&code_bloco_false);
+  op_iloc_t op_load_b = init_op_load_var(offset_b);
+  insere_item_array_op_iloc(&code_bloco_false, op_load_b);
+
+  // if (z * (x + y) > 3) bloco_true else bloco_false
+  array_op_iloc_t code_if_else;
+  init_array_op_iloc(&code_if_else);
+  op_iloc_t op_rotulo_true = init_op_iloc();
+  op_iloc_t op_rotulo_false = init_op_iloc();
+  op_iloc_t op_rotulo_skip = init_op_iloc();
+  gera_rotulo(&op_rotulo_true.rotulo);
+  gera_rotulo(&op_rotulo_false.rotulo);
+  gera_rotulo(&op_rotulo_skip.rotulo);
+  op_iloc_t op_if_else = init_op_cbr(temp_gt, op_rotulo_true.rotulo, op_rotulo_false.rotulo);
+  op_iloc_t op_jump = init_op_jump(op_rotulo_skip.rotulo);
+  append_array_op_iloc(&code_if_else, &code_gt);
+  insere_item_array_op_iloc(&code_if_else, op_if_else);
+  insere_item_array_op_iloc(&code_if_else, op_rotulo_true);
+  append_array_op_iloc(&code_if_else, &code_bloco_true);
+  insere_item_array_op_iloc(&code_if_else, op_jump);
+  insere_item_array_op_iloc(&code_if_else, op_rotulo_false);
+  append_array_op_iloc(&code_if_else, &code_bloco_false);
+  insere_item_array_op_iloc(&code_if_else, op_rotulo_skip);
+
+  print_array_op_iloc(code_if_else);
+  free_array_op_iloc(&code_if_else);
   exit(0);
 
 }
