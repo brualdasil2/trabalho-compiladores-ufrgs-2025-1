@@ -34,6 +34,8 @@ typedef struct s_array_op_iloc {
 } array_op_iloc_t;
 
 op_iloc_t init_op_iloc();
+op_iloc_t init_op_load_var(int offset);
+op_iloc_t init_op_3(char* mnemonico, operando_iloc_t op1, operando_iloc_t op2);
 void gera_rotulo(rotulo_iloc_t* rotulo);
 void gera_temp(operando_iloc_t* operando);
 void set_operando_int(operando_iloc_t* operando, int valor);

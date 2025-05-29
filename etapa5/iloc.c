@@ -24,6 +24,22 @@ op_iloc_t init_op_iloc() {
     strcpy(op.rotulo.valor, "");
     return op;
 }
+op_iloc_t init_op_load_var(int offset) {
+    op_iloc_t op = init_op_iloc();
+    strcpy(op.mnemonico.valor, "loadAI");
+    strcpy(op.op1.valor, "rfp");
+    set_operando_int(&op.op2, offset);
+    gera_temp(&op.op3);
+    return op;
+}
+op_iloc_t init_op_3(char* mnemonico, operando_iloc_t op1, operando_iloc_t op2) {
+    op_iloc_t op = init_op_iloc();
+    strcpy(op.mnemonico.valor, mnemonico);
+    strcpy(op.op1.valor, op1.valor);
+    strcpy(op.op2.valor, op2.valor);
+    gera_temp(&op.op3);
+    return op;
+}
 void init_array_op_iloc(array_op_iloc_t* array) {
     array->ops = (op_iloc_t*) malloc(DELTA_TAM*sizeof(op_iloc_t));
     array->tamanho_usado = 0;

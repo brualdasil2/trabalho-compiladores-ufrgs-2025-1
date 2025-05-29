@@ -9,35 +9,28 @@ asd_tree_t *arvore = NULL;
 void test_iloc() {
   int offset_x_add = 0;
   int offset_y_add = 4;
+  int offset_z_mult= 8;
 
   array_op_iloc_t code_add;
   init_array_op_iloc(&code_add);
-
-  op_iloc_t op_load_t1 = init_op_iloc();
-  strcpy(op_load_t1.mnemonico.valor, "loadAI");
-  strcpy(op_load_t1.op1.valor, "rfp");
-  set_operando_int(&op_load_t1.op2, offset_x_add);
-  gera_temp(&op_load_t1.op3);
-  
-  op_iloc_t op_load_t2 = init_op_iloc();
-  strcpy(op_load_t2.mnemonico.valor, "loadAI");
-  strcpy(op_load_t2.op1.valor, "rfp");
-  set_operando_int(&op_load_t2.op2, offset_y_add);
-  gera_temp(&op_load_t2.op3);
-
-  op_iloc_t op_add = init_op_iloc();
-  strcpy(op_add.mnemonico.valor, "add");
-  //gera_rotulo(&op_add.rotulo);
-  strcpy(op_add.op1.valor, op_load_t1.op3.valor);
-  strcpy(op_add.op2.valor, op_load_t2.op3.valor);
-  gera_temp(&op_add.op3);
-
+  op_iloc_t op_load_t1 = init_op_load_var(offset_x_add);
+  op_iloc_t op_load_t2 = init_op_load_var(offset_y_add);
+  op_iloc_t op_add = init_op_3("add", op_load_t1.op3, op_load_t2.op3);
   insere_item_array_op_iloc(&code_add, op_load_t1);
   insere_item_array_op_iloc(&code_add, op_load_t2);
   insere_item_array_op_iloc(&code_add, op_add);
 
-  print_array_op_iloc(code_add);
-  free_array_op_iloc(&code_add);
+  array_op_iloc_t code_mult;
+  init_array_op_iloc(&code_mult);
+  op_iloc_t op_load_z = init_op_load_var(offset_z_mult);
+  op_iloc_t op_mult = init_op_3("mult", op_load_z.op3, op_add.op3);
+
+  append_array_op_iloc(&code_mult, &code_add);
+  insere_item_array_op_iloc(&code_mult, op_load_z);
+  insere_item_array_op_iloc(&code_mult, op_mult);
+
+  print_array_op_iloc(code_mult);
+  free_array_op_iloc(&code_mult);
   exit(0);
 
 }
