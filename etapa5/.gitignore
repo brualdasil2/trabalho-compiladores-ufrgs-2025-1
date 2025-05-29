@@ -1,0 +1,6 @@
+*.o
+lex.yy.c
+etapa5
+parser.tab.c
+parser.tab.h
+.vscode
