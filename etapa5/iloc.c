@@ -7,7 +7,7 @@ int rotulo_counter = 0;
 int temp_counter = 0;
 
 void gera_rotulo(rotulo_iloc_t* rotulo) {
-    sprintf(rotulo->valor, "L%d:", rotulo_counter++);
+    sprintf(rotulo->valor, "L%d", rotulo_counter++);
 }
 void gera_temp(operando_iloc_t* operando) {
     sprintf(operando->valor, "r%d", temp_counter++);
@@ -73,9 +73,12 @@ void print_array_op_iloc(array_op_iloc_t array) {
             printf("%s ", op.mnemonico.valor);
         }
         else {
-            printf("%s %s ", op.rotulo.valor, op.mnemonico.valor);
+            printf("%s: %s ", op.rotulo.valor, op.mnemonico.valor);
         }
-        if (strlen(op.op2.valor) == 0) {
+        if (!strcmp(op.mnemonico.valor, "cbr")) {
+            printf("%s => %s, %s\n", op.op1.valor, op.op2.valor, op.op3.valor);
+        }
+        else if (strlen(op.op2.valor) == 0) {
             // só tem um operando, logo fica à direita da seta
             printf("=> %s\n", op.op1.valor);
         }
