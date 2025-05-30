@@ -266,7 +266,7 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
     $$ = asd_create_and_add_2(valor, $2, $6);
     inferencia_tipo_op_binaria($$, $2, $6);
     gera_load_var($6);
-    gera_store_var($$, $1, $6);
+    gera_store_var($$, $2, $6);
 }
 Identificador: TK_ID {
     // Complicado fazer ações semanticas aqui, pois n se sabe se esse ID é de uma declaração ou de um uso
@@ -348,17 +348,20 @@ Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco {
     valor_t valor = valor_simples("if");
     $$ = asd_create_and_add_2(valor, $3, $5);
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
+    gera_if($$, $3, $5);
 }
 Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco {
     check_if_else($5, $7);
     valor_t valor = valor_simples("if");
     $$ = asd_create_and_add_3(valor, $3, $5, $7);
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
+    gera_if_else($$, $3, $5, $7);
 }
 Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco {
     valor_t valor = valor_simples("while");
     $$ = asd_create_and_add_2(valor, $3, $5);
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
+    gera_while($$, $3, $5);
 }
 Expressao: T8 {
     $$ = $1;

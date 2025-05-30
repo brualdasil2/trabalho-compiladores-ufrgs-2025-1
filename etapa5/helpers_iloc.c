@@ -39,3 +39,51 @@ void gera_sub_unario(asd_tree_t* op_node, asd_tree_t* op1_node) {
     insere_item_array_op_iloc(&(op_node->valor.code), op_rsub_i);
     op_node->valor.temp = op_rsub_i.op3;
 }
+
+void gera_if(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_true) {
+    op_iloc_t op_rotulo_true = init_op_iloc();
+    op_iloc_t op_rotulo_false = init_op_iloc();
+    gera_rotulo(&(op_rotulo_true.rotulo));
+    gera_rotulo(&(op_rotulo_false.rotulo));
+    op_iloc_t op_cbr = init_op_cbr(test_node->valor.temp, op_rotulo_true.rotulo, op_rotulo_false.rotulo);
+    append_array_op_iloc(&(op_node->valor.code), &(test_node->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_cbr);
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_true);
+    append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_false);
+}
+void gera_if_else(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_true, asd_tree_t* bloco_false) {
+    op_iloc_t op_rotulo_true = init_op_iloc();
+    op_iloc_t op_rotulo_false = init_op_iloc();
+    op_iloc_t op_rotulo_skip = init_op_iloc();
+    gera_rotulo(&(op_rotulo_true.rotulo));
+    gera_rotulo(&(op_rotulo_false.rotulo));
+    gera_rotulo(&(op_rotulo_skip.rotulo));
+    op_iloc_t op_cbr = init_op_cbr(test_node->valor.temp, op_rotulo_true.rotulo, op_rotulo_false.rotulo);
+    op_iloc_t op_jump = init_op_jump(op_rotulo_skip.rotulo);
+    append_array_op_iloc(&(op_node->valor.code), &(test_node->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_cbr);
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_true);
+    append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_jump);
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_false);
+    append_array_op_iloc(&(op_node->valor.code), &(bloco_false->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_skip);
+}
+void gera_while(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_true) {
+    op_iloc_t op_rotulo_true = init_op_iloc();
+    op_iloc_t op_rotulo_false = init_op_iloc();
+    op_iloc_t op_rotulo_start = init_op_iloc();
+    gera_rotulo(&(op_rotulo_start.rotulo));
+    gera_rotulo(&(op_rotulo_true.rotulo));
+    gera_rotulo(&(op_rotulo_false.rotulo));
+    op_iloc_t op_cbr = init_op_cbr(test_node->valor.temp, op_rotulo_true.rotulo, op_rotulo_false.rotulo);
+    op_iloc_t op_jump = init_op_jump(op_rotulo_start.rotulo);
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_start);
+    append_array_op_iloc(&(op_node->valor.code), &(test_node->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_cbr);
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_true);
+    append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_jump);
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_false);
+}

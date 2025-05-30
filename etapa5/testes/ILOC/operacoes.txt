@@ -72,6 +72,16 @@ ILOC:
     bloco_true.code
     LF: nop
 
+Código fonte:
+    while (exp) bloco
+ILOC:
+    LS: nop
+    exp.code
+    cbr t1 -> LT, LF
+    LT: nop
+    bloco.code
+    jumpI -> LS
+    LF: nop
 
 ## Dúvidas
 
