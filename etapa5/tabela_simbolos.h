@@ -7,6 +7,8 @@
 typedef enum { NAT_LITERAL, NAT_IDENTIFICADOR, NAT_FUNCAO } natureza_t;
 
 #define PRINTS_DEBUG_TABELA 0
+#define TAM_INT 4
+
 
 typedef struct s_item_tabela_t {
     char* chave;
@@ -14,12 +16,15 @@ typedef struct s_item_tabela_t {
     tipo_dado_t tipo_dado;
     array_argumento_t argumentos;
     int linha_token;
+    int offset;
+    int is_global;
 } item_tabela_t;
 
 typedef struct s_tabela_simbolos_t {
     item_tabela_t* itens;
     size_t tamanho_usado;
     size_t tamanho_total;
+    int is_global;
 } tabela_simbolos_t;
 
 tabela_simbolos_t* init_tabela();

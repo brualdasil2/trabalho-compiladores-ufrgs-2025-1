@@ -34,7 +34,8 @@ typedef struct s_array_op_iloc {
 } array_op_iloc_t;
 
 op_iloc_t init_op_iloc();
-op_iloc_t init_op_load_var(int offset);
+op_iloc_t init_op_load_var(int offset, int is_global);
+op_iloc_t init_op_store_var(int offset, int is_global, operando_iloc_t temp);
 op_iloc_t init_op_3(char* mnemonico, operando_iloc_t op1, operando_iloc_t op2);
 op_iloc_t init_op_cbr(operando_iloc_t test, rotulo_iloc_t rot_true, rotulo_iloc_t rot_false);
 op_iloc_t init_op_jump(rotulo_iloc_t rot);

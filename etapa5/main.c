@@ -18,7 +18,7 @@ void test_iloc() {
   operando_iloc_t temp_x;
   array_op_iloc_t code_x;
   init_array_op_iloc(&code_x);
-  op_iloc_t op_load_x = init_op_load_var(offset_x);
+  op_iloc_t op_load_x = init_op_load_var(offset_x, 0);
   insere_item_array_op_iloc(&code_x, op_load_x);
   temp_x = op_load_x.op3;
   
@@ -26,7 +26,7 @@ void test_iloc() {
   operando_iloc_t temp_y;
   array_op_iloc_t code_y;
   init_array_op_iloc(&code_y);
-  op_iloc_t op_load_y = init_op_load_var(offset_y);
+  op_iloc_t op_load_y = init_op_load_var(offset_y, 0);
   insere_item_array_op_iloc(&code_y, op_load_y);
   temp_y = op_load_y.op3;
   
@@ -44,7 +44,7 @@ void test_iloc() {
   operando_iloc_t temp_z;
   array_op_iloc_t code_z;
   init_array_op_iloc(&code_z);
-  op_iloc_t op_load_z = init_op_load_var(offset_z);
+  op_iloc_t op_load_z = init_op_load_var(offset_z, 0);
   insere_item_array_op_iloc(&code_z, op_load_z);
   temp_z = op_load_z.op3;
   
@@ -63,7 +63,7 @@ void test_iloc() {
   operando_iloc_t temp_3;
   array_op_iloc_t code_3;
   init_array_op_iloc(&code_3);
-  op_iloc_t op_load_3 = init_op_load_var(offset_lit_3);
+  op_iloc_t op_load_3 = init_op_load_var(offset_lit_3, 0);
   insere_item_array_op_iloc(&code_3, op_load_3);
   temp_3 = op_load_3.op3;
 
@@ -79,14 +79,14 @@ void test_iloc() {
   // bloco_true
   array_op_iloc_t code_bloco_true;
   init_array_op_iloc(&code_bloco_true);
-  op_iloc_t op_load_a = init_op_load_var(offset_a);
+  op_iloc_t op_load_a = init_op_load_var(offset_a, 0);
   insere_item_array_op_iloc(&code_bloco_true, op_load_a);
   temp_gt = op_gt.op3;
 
   // bloco_false
   array_op_iloc_t code_bloco_false;
   init_array_op_iloc(&code_bloco_false);
-  op_iloc_t op_load_b = init_op_load_var(offset_b);
+  op_iloc_t op_load_b = init_op_load_var(offset_b, 0);
   insere_item_array_op_iloc(&code_bloco_false, op_load_b);
 
   // if (z * (x + y) > 3) bloco_true else bloco_false
@@ -116,9 +116,12 @@ void test_iloc() {
 }
 int main (int argc, char **argv)
 {
-  test_iloc();
+  //test_iloc();
   int ret = yyparse();
-  asd_print_graphviz(arvore);
+  //asd_print_graphviz(arvore);
+  if (arvore != NULL) {
+    print_array_op_iloc(arvore->valor.code);
+  }
   asd_free(arvore);
   yylex_destroy();
   return ret;

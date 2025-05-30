@@ -1,0 +1,4 @@
+declare x as int,
+main returns int is [
+    x is x + 3
+];

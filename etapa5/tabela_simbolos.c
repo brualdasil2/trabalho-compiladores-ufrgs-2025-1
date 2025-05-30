@@ -8,6 +8,7 @@ tabela_simbolos_t* init_tabela() {
     tabela->itens = (item_tabela_t*) malloc(DELTA_TAM*sizeof(item_tabela_t));
     tabela->tamanho_usado = 0;
     tabela->tamanho_total = DELTA_TAM;
+    tabela->is_global = 0;
     return tabela;
 }
 
@@ -16,6 +17,16 @@ void insere_item_tabela_simbolos(tabela_simbolos_t* tabela, item_tabela_t item) 
         tabela->tamanho_total += DELTA_TAM;
         tabela->itens = (item_tabela_t*) realloc(tabela->itens, tabela->tamanho_total*sizeof(item_tabela_t));
     }
+    item.is_global = tabela->is_global;
+    // calcula offset a partir do offset do ultimo int ou lit adicionado
+    item.offset = 0;
+    for (int i = tabela->tamanho_usado-1; i >= 0; i--) {
+        if (tabela->itens[i].natureza == NAT_FUNCAO) {
+            continue;
+        }
+        item.offset = tabela->itens[i].offset + TAM_INT;
+    }
+    
     tabela->itens[tabela->tamanho_usado] = item;
     tabela->tamanho_usado++;
     if (PRINTS_DEBUG_TABELA)

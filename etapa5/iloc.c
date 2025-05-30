@@ -24,12 +24,26 @@ op_iloc_t init_op_iloc() {
     strcpy(op.rotulo.valor, "");
     return op;
 }
-op_iloc_t init_op_load_var(int offset) {
+op_iloc_t init_op_load_var(int offset, int is_global) {
     op_iloc_t op = init_op_iloc();
     strcpy(op.mnemonico.valor, "loadAI");
-    strcpy(op.op1.valor, "rfp");
+    if (is_global)
+        strcpy(op.op1.valor, "rbss");
+    else
+        strcpy(op.op1.valor, "rfp");
     set_operando_int(&op.op2, offset);
     gera_temp(&op.op3);
+    return op;
+}
+op_iloc_t init_op_store_var(int offset, int is_global, operando_iloc_t temp) {
+    op_iloc_t op = init_op_iloc();
+    strcpy(op.mnemonico.valor, "storeAI");
+    strcpy(op.op1.valor, temp.valor);
+    if (is_global)
+        strcpy(op.op2.valor, "rbss");
+    else
+        strcpy(op.op2.valor, "rfp");
+    set_operando_int(&op.op3, offset);
     return op;
 }
 op_iloc_t init_op_3(char* mnemonico, operando_iloc_t op1, operando_iloc_t op2) {
@@ -93,6 +107,9 @@ void print_array_op_iloc(array_op_iloc_t array) {
 
         if (!strcmp(op.mnemonico.valor, "nop")) {
             printf("\n");
+        }
+        else if (!strcmp(op.mnemonico.valor, "storeAI")) {
+            printf("%s => %s, %s\n", op.op1.valor, op.op2.valor, op.op3.valor);
         }
         else if (!strcmp(op.mnemonico.valor, "cbr")) {
             printf("%s -> %s, %s\n", op.op1.valor, op.op2.valor, op.op3.valor);

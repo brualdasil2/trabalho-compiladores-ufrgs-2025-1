@@ -10,6 +10,7 @@
 #include "erros.h"
 #include "utils.h"
 #include "helpers_semantica.h"
+#include "helpers_iloc.h"
 int yylex(void);
 void yyerror (char const *mensagem);
 int get_line_number();
@@ -102,6 +103,7 @@ Programa: { $$ = NULL; }
 Cria_tabela_global: {
     init_pilha_tabelas();
     tabela_simbolos_t* tabela = init_tabela();
+    tabela->is_global = 1;
     push_pilha_tabelas(tabela);
 }
 Free_tabela_global: {
@@ -122,6 +124,7 @@ Lista: Elemento ',' Lista {
     else {
         // Os dois existem, bota lista de filho do elemento
         asd_add_child($1, $3);
+        append_array_op_iloc(&($1->valor.code), &($3->valor.code));
         $$ = $1;
     }
 }
@@ -137,7 +140,8 @@ Elemento: Dec_var {
 Def_func: Cab_func Corpo_func { 
     $$ = $1;
     if ($2 != NULL) {
-        asd_add_child($1, $2);    
+        asd_add_child($1, $2);
+        append_array_op_iloc(&($1->valor.code), &($2->valor.code));
     }
     func_atual = NULL;
 }
@@ -233,6 +237,7 @@ Lista_com: Comando Lista_com {
     else {
         // Comando e Lista_com existem, bota Lista_com como filho e retorna o comando
         asd_add_child($1, $2);
+        append_array_op_iloc(&($1->valor.code), &($2->valor.code));
         $$ = $1;
     }
 }
@@ -282,6 +287,7 @@ Atrib: Identificador TK_PR_IS Expressao {
     $$ = asd_create_and_add_2(valor, $1, $3);
     set_tipo_da_tabela($1, $1->valor.lexema);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_store_var($$, $1, $3);
 }
 Chama_func: Identificador '(' Lista_args ')' {
     check_undeclared($1);
@@ -405,6 +411,7 @@ T4: T4 '+' T3 {
     valor_t valor = valor_simples("+");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("add", $$, $1, $3);
 }
 T4: T4 '-' T3 {
     valor_t valor = valor_simples("-");
@@ -450,10 +457,12 @@ T1: Identificador {
     check_undeclared($1);
     check_is_var($1);
     set_tipo_da_tabela($1, $1->valor.lexema);
+    gera_load_var($1);
     $$ = $1; 
 }
 T1: Literal { 
     insere_literal_tabela($1->valor, $1->valor.tipo_dado_inferido);
+    gera_load_var($1);
     $$ = $1;
 }
 T1: Chama_func { 
