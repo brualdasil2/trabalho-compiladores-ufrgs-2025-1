@@ -24,7 +24,18 @@ void gera_store_var(asd_tree_t* op_node, asd_tree_t* id_node, asd_tree_t* exp_no
     insere_item_array_op_iloc(&(op_node->valor.code), op);
 }
 
-/*
-storeAI Exp.temp => (rfp / rbss), Id.offset
-
-*/
+void gera_not_unario(asd_tree_t* op_node, asd_tree_t* op1_node) {
+    op_iloc_t op_load_0 = init_op_load_0();
+    op_iloc_t op_cmp_eq = init_op_3("cmp_EQ", op1_node->valor.temp, op_load_0.op2);
+    append_array_op_iloc(&(op_node->valor.code), &(op1_node->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_load_0);
+    insere_item_array_op_iloc(&(op_node->valor.code), op_cmp_eq);
+    op_node->valor.temp = op_cmp_eq.op3;
+}
+void gera_sub_unario(asd_tree_t* op_node, asd_tree_t* op1_node) {
+    operando_iloc_t zero = { "0" };
+    op_iloc_t op_rsub_i = init_op_3("rsubI", zero, op1_node->valor.temp);
+    append_array_op_iloc(&(op_node->valor.code), &(op1_node->valor.code));
+    insere_item_array_op_iloc(&(op_node->valor.code), op_rsub_i);
+    op_node->valor.temp = op_rsub_i.op3;
+}

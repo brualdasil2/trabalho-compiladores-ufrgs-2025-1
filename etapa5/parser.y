@@ -365,6 +365,7 @@ T8: T8 '|' T7 {
     valor_t valor = valor_simples("|");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("or", $$, $1, $3);
 }
 T8: T7 {
     $$ = $1;
@@ -373,38 +374,45 @@ T7: T7 '&' T6 {
     valor_t valor = valor_simples("&");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("and", $$, $1, $3);
 }
 T7: T6 { $$ = $1; }
 T6: T6 TK_OC_EQ T5 {
     valor_t valor = valor_simples("==");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("cmp_EQ", $$, $1, $3);
 }
 T6: T6 TK_OC_NE T5 { 
     valor_t valor = valor_simples("!=");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("cmp_NE", $$, $1, $3);
 }
 T6: T5 { $$ = $1; }
 T5: T5 TK_OC_GE T4 { 
     valor_t valor = valor_simples(">=");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("cmp_GE", $$, $1, $3);
 }
 T5: T5 TK_OC_LE T4 {
     valor_t valor = valor_simples("<=");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("cmp_LE", $$, $1, $3);
 }
 T5: T5 '<' T4 {
     valor_t valor = valor_simples("<");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("cmp_LT", $$, $1, $3);
 }
 T5: T5 '>' T4 {
     valor_t valor = valor_simples(">");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("cmp_GT", $$, $1, $3);
 }
 T5: T4 { $$ = $1; }
 T4: T4 '+' T3 { 
@@ -417,38 +425,45 @@ T4: T4 '-' T3 {
     valor_t valor = valor_simples("-");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("sub", $$, $1, $3);
 }
 T4: T3 { $$ = $1; }
 T3: T3 '*' T2 { 
     valor_t valor = valor_simples("*");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("mult", $$, $1, $3);
 }
 T3: T3 '/' T2  {
     valor_t valor = valor_simples("/");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    gera_op_3("div", $$, $1, $3);
 }
 T3: T3 '%' T2  {
     valor_t valor = valor_simples("%");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
+    // Ignorar para e5
 }
 T3: T2 { $$ = $1; }
 T2: '+' T2 {
     valor_t valor = valor_simples("+");
     $$ = asd_create_and_add_1(valor, $2);
     $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
+    // O que essa operação faz??!
 }
 T2: '-' T2  {
     valor_t valor = valor_simples("-");
     $$ = asd_create_and_add_1(valor, $2);
     $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
+    gera_sub_unario($$, $2);
 }
 T2: '!' T2 {
     valor_t valor = valor_simples("!");
     $$ = asd_create_and_add_1(valor, $2);
     $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
+    gera_not_unario($$, $2);
 }
 T2: T1 { $$ = $1; }
 T1: '(' Expressao ')' { $$ = $2; }
