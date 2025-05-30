@@ -49,7 +49,8 @@ void gera_if(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_true)
     append_array_op_iloc(&(op_node->valor.code), &(test_node->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_cbr);
     insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_true);
-    append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
+    if (bloco_true)
+        append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_false);
 }
 void gera_if_else(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_true, asd_tree_t* bloco_false) {
@@ -64,10 +65,12 @@ void gera_if_else(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_
     append_array_op_iloc(&(op_node->valor.code), &(test_node->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_cbr);
     insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_true);
-    append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
+    if (bloco_true)
+        append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_jump);
     insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_false);
-    append_array_op_iloc(&(op_node->valor.code), &(bloco_false->valor.code));
+    if (bloco_false)
+        append_array_op_iloc(&(op_node->valor.code), &(bloco_false->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_skip);
 }
 void gera_while(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_true) {
@@ -83,7 +86,8 @@ void gera_while(asd_tree_t* op_node, asd_tree_t* test_node, asd_tree_t* bloco_tr
     append_array_op_iloc(&(op_node->valor.code), &(test_node->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_cbr);
     insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_true);
-    append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
+    if (bloco_true)
+        append_array_op_iloc(&(op_node->valor.code), &(bloco_true->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_jump);
     insere_item_array_op_iloc(&(op_node->valor.code), op_rotulo_false);
 }
