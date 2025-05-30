@@ -265,6 +265,8 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
     insere_literal_tabela($6->valor, $6->valor.tipo_dado_inferido);
     $$ = asd_create_and_add_2(valor, $2, $6);
     inferencia_tipo_op_binaria($$, $2, $6);
+    gera_load_var($6);
+    gera_store_var($$, $1, $6);
 }
 Identificador: TK_ID {
     // Complicado fazer ações semanticas aqui, pois n se sabe se esse ID é de uma declaração ou de um uso
