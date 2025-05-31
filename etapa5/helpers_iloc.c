@@ -39,7 +39,7 @@ void gera_not_unario(asd_tree_t* op_node, asd_tree_t* op1_node) {
 }
 void gera_sub_unario(asd_tree_t* op_node, asd_tree_t* op1_node) {
     operando_iloc_t zero = { "0" };
-    op_iloc_t op_rsub_i = init_op_3("rsubI", zero, op1_node->valor.temp);
+    op_iloc_t op_rsub_i = init_op_3("rsubI", op1_node->valor.temp, zero);
     append_array_op_iloc(&(op_node->valor.code), &(op1_node->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_rsub_i);
     op_node->valor.temp = op_rsub_i.op3;
