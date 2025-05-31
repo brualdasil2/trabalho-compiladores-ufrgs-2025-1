@@ -5,17 +5,18 @@ main returns int is [
     declare y as int with 10
     declare z as int with 10
     a is 0
-    w is -w
-    if (x == 0) [
+    w is -w // pois não dá pra declarar direto com -5
+    if (x == 0) [ // true
         a is a + 1
     ]
-    if (y >= x & x > w) [
+    if (y >= x & x > w) [ // true
         a is a + 1
     ]
-    if (y < x | z <= w) [
+    if (y < x | z <= w) [ // false
         a is a + 1
     ]
-    if (x + y - 1 != 10) [
+    if (x + y - 1 != 10) [ // true
         a is a + 1
     ]
+    // a termina com 3
 ];

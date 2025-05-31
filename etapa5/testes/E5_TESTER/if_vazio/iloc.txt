@@ -10,3 +10,9 @@ L2: nop
 jumpI -> L4
 L3: nop 
 L4: nop 
+L5: nop 
+loadI 0 => r3
+cbr r3 -> L6, L7
+L6: nop 
+jumpI -> L5
+L7: nop 

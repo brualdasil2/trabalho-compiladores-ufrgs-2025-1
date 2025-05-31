@@ -5,4 +5,5 @@ main returns int is [
         x is x + 2
         y is y - 1
     ]
+    // x termina com 20, y com 0
 ];

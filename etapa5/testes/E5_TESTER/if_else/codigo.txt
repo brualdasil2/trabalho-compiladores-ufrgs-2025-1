@@ -13,4 +13,5 @@ main returns int is [
     else [
         y is y + 5
     ]
+    // x termina com 1, y com 5
 ];
