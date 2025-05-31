@@ -8,6 +8,11 @@ void gera_load_var(asd_tree_t* node) {
     insere_item_array_op_iloc(&(node->valor.code), op_load);
     node->valor.temp = op_load.op3;
 }
+void gera_load_lit(asd_tree_t* node) {
+    op_iloc_t op_load = init_op_load_lit(node->valor.lexema);
+    insere_item_array_op_iloc(&(node->valor.code), op_load);
+    node->valor.temp = op_load.op2;
+}
 
 void gera_op_3(char* mnemonico, asd_tree_t* op_node, asd_tree_t* op1_node, asd_tree_t* op2_node) {
     op_iloc_t op = init_op_3(mnemonico, op1_node->valor.temp, op2_node->valor.temp);
@@ -25,7 +30,7 @@ void gera_store_var(asd_tree_t* op_node, asd_tree_t* id_node, asd_tree_t* exp_no
 }
 
 void gera_not_unario(asd_tree_t* op_node, asd_tree_t* op1_node) {
-    op_iloc_t op_load_0 = init_op_load_0();
+    op_iloc_t op_load_0 = init_op_load_lit("0");
     op_iloc_t op_cmp_eq = init_op_3("cmp_EQ", op1_node->valor.temp, op_load_0.op2);
     append_array_op_iloc(&(op_node->valor.code), &(op1_node->valor.code));
     insere_item_array_op_iloc(&(op_node->valor.code), op_load_0);

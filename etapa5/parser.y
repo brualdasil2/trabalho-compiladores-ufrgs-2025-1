@@ -265,7 +265,7 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
     insere_literal_tabela($6->valor, $6->valor.tipo_dado_inferido);
     $$ = asd_create_and_add_2(valor, $2, $6);
     inferencia_tipo_op_binaria($$, $2, $6);
-    gera_load_var($6);
+    gera_load_lit($6);
     gera_store_var($$, $2, $6);
 }
 Identificador: TK_ID {
@@ -482,7 +482,7 @@ T1: Identificador {
 }
 T1: Literal { 
     insere_literal_tabela($1->valor, $1->valor.tipo_dado_inferido);
-    gera_load_var($1);
+    gera_load_lit($1);
     $$ = $1;
 }
 T1: Chama_func { 

@@ -18,13 +18,14 @@ void insere_item_tabela_simbolos(tabela_simbolos_t* tabela, item_tabela_t item) 
         tabela->itens = (item_tabela_t*) realloc(tabela->itens, tabela->tamanho_total*sizeof(item_tabela_t));
     }
     item.is_global = tabela->is_global;
-    // calcula offset a partir do offset do ultimo int ou lit adicionado
+    // calcula offset a partir do offset do ultimo int adicionado
     item.offset = 0;
     for (int i = tabela->tamanho_usado-1; i >= 0; i--) {
-        if (tabela->itens[i].natureza == NAT_FUNCAO) {
+        if (tabela->itens[i].natureza != NAT_IDENTIFICADOR) {
             continue;
         }
         item.offset = tabela->itens[i].offset + TAM_INT;
+        break;
     }
     
     tabela->itens[tabela->tamanho_usado] = item;
