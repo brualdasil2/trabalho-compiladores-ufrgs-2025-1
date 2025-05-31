@@ -1,0 +1,8 @@
+loadI 5 => r0
+storeAI r0 => rfp, 0
+loadI 6 => r1
+storeAI r1 => rfp, 4
+loadAI rfp, 0 => r2
+storeAI r2 => rbss, 0
+loadAI rfp, 4 => r3
+storeAI r3 => rbss, 4

@@ -1,0 +1,21 @@
+declare a as int,
+main returns int is [
+    declare w as int with 5
+    declare x as int with 0
+    declare y as int with 10
+    declare z as int with 10
+    a is 0
+    w is -w
+    if (x == 0) [
+        a is a + 1
+    ]
+    if (y >= x & x > w) [
+        a is a + 1
+    ]
+    if (y < x | z <= w) [
+        a is a + 1
+    ]
+    if (x + y - 1 != 10) [
+        a is a + 1
+    ]
+];
