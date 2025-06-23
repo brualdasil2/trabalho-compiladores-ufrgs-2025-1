@@ -285,6 +285,8 @@ Literal: TK_LI_FLOAT {
     free($1);
 }
 Atrib: Identificador TK_PR_IS Expressao { 
+    check_undeclared($1);
+    check_is_var($1);
     valor_t valor = valor_simples("is");
     $$ = asd_create_and_add_2(valor, $1, $3);
     set_tipo_da_tabela($1, $1->valor.lexema);
