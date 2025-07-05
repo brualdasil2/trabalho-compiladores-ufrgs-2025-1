@@ -1,0 +1,104 @@
+Código fonte:
+    !x
+ILOC:
+    // offset x = 4
+    loadAI rfp, 4 => t1
+    loadI 0 => t2
+    cmp_EQ t1, t2 => t3
+    // resultado em t3
+
+Código fonte:
+    -x
+ILOC:
+    // offset x = 4
+    loadAI rfp, 4 => t1
+    rsubI 0, t1 => t2 // 0 - t1
+    // resultado em t2
+
+Código fonte:
+    +x
+ILOC:
+    ?? O que faz esse?
+
+Código fonte:
+    x (/*+-) y
+ILOC:
+    // offset x = 4
+    // offset y = 8
+    loadAI rfp, 4 => t1
+    loadAI rfp, 8 => t2
+    (div/mult/add/sub) t1, t2 => t3
+    // resultado em t3
+
+Código fonte:
+    x (>|<|>=|<=|==|!=) y
+ILOC:
+    // offset x = 4
+    // offset y = 8
+    loadAI rfp, 4 => t1
+    loadAI rfp, 8 => t2
+    (cmp_GT/cmp_LT/cmp_GE/cmp_LE/cmp_EQ/cmp_NE) t1, t2 => t3
+    // resultado em t3
+
+Código fonte:
+    x (& ou |) y
+ILOC:
+    // offset x = 4
+    // offset y = 8
+    loadAI rfp, 4 => t1
+    loadAI rfp, 8 => t2
+    (and/or) t1, t2 => t3
+    // resultado em t3
+
+
+Código fonte:
+    if (t1) bloco_true else bloco_false
+ILOC:
+    exp.code
+    cbr t1 -> LT, LF
+    LT: nop
+    bloco_true.code
+    jumpI -> LS
+    LF: nop
+    bloco_false.code
+    LS: nop
+
+Código fonte:
+    if (t1) bloco_true
+ILOC:
+    exp.code
+    cbr t1 -> LT, LF
+    LT: nop
+    bloco_true.code
+    LF: nop
+
+Código fonte:
+    while (exp) bloco
+ILOC:
+    LS: nop
+    exp.code
+    cbr t1 -> LT, LF
+    LT: nop
+    bloco.code
+    jumpI -> LS
+    LF: nop
+
+## Dúvidas
+
+### Offsets de escopos aninhados sem função
+
+delcare x
+declare y
+if (aaa) [
+    declare z
+]
+declare a
+
+Tabela 1:
+    x offset 0
+    y offset 4
+Tabela 2:
+    z offset 8 ?? se fosse função, seria offset 0, como é novo escopo na mesma func, calcula baseado no offset do bloco anterior?
+
+### O que faz +x?
+

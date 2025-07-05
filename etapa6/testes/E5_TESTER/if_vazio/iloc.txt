@@ -1,0 +1,18 @@
+loadI 0 => r0
+storeAI r0 => rfp, 0
+loadI 1 => r1
+cbr r1 -> L0, L1
+L0: nop 
+L1: nop 
+loadI 0 => r2
+cbr r2 -> L2, L3
+L2: nop 
+jumpI -> L4
+L3: nop 
+L4: nop 
+L5: nop 
+loadI 0 => r3
+cbr r3 -> L6, L7
+L6: nop 
+jumpI -> L5
+L7: nop 

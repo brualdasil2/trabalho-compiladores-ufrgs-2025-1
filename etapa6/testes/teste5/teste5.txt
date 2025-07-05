@@ -1,0 +1,23 @@
+declare x as int,
+main returns int is [
+    declare y as int
+    declare z as int
+    x is x + 3
+    y is (x + z) * y + (x + x)/z
+    if (y > (4-x) & x != 0) [
+        x is 0
+    ]
+    else [
+        x is 1
+    ]
+    while (x > (2*y+3) | y >= z) [
+        x is x + 1
+        y is y - 1
+    ]
+    if (x > 2) [
+        x is 0
+    ]
+    if (x == 2) [
+        
+    ]
+];

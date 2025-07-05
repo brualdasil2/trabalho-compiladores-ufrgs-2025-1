@@ -1,0 +1,17 @@
+main returns int is [
+    declare x as int with 0
+    declare y as int with 0
+    if (1) [
+        x is x + 1
+    ]
+    else [
+        x is x + 5
+    ]
+    if (0) [
+        y is y + 1
+    ]
+    else [
+        y is y + 5
+    ]
+    // x termina com 1, y com 5
+];
