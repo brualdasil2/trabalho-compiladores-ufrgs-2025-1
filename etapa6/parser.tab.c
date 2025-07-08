@@ -80,7 +80,7 @@
 #include "erros.h"
 #include "utils.h"
 #include "helpers_semantica.h"
-#include "helpers_iloc.h"
+#include "helpers_asm.h"
 int yylex(void);
 void yyerror (char const *mensagem);
 int get_line_number();
@@ -584,13 +584,13 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,    99,    99,   102,   103,   109,   112,   131,   134,   137,
-     140,   148,   158,   166,   170,   173,   179,   180,   181,   185,
-     188,   191,   194,   197,   200,   203,   206,   209,   212,   216,
-     219,   222,   225,   244,   247,   255,   258,   271,   277,   282,
-     287,   296,   313,   329,   335,   341,   342,   347,   348,   349,
-     355,   362,   368,   371,   377,   380,   386,   387,   393,   399,
-     400,   406,   412,   418,   424,   425,   431,   437,   438,   444,
-     450,   456,   457,   463,   469,   475,   476,   477,   485,   490
+     140,   149,   159,   167,   171,   174,   180,   181,   182,   186,
+     189,   192,   195,   198,   201,   204,   207,   210,   213,   217,
+     220,   223,   226,   245,   248,   256,   259,   271,   277,   282,
+     287,   296,   313,   329,   335,   341,   342,   348,   349,   350,
+     356,   363,   369,   372,   378,   381,   387,   388,   394,   400,
+     401,   407,   413,   419,   425,   426,   432,   438,   439,   445,
+     451,   457,   458,   464,   470,   476,   477,   478,   486,   491
 };
 #endif
 
@@ -1560,7 +1560,7 @@ yyreduce:
     else {
         // Os dois existem, bota lista de filho do elemento
         asd_add_child((yyvsp[-2].no), (yyvsp[0].no));
-        append_array_op_iloc(&((yyvsp[-2].no)->valor.code), &((yyvsp[0].no)->valor.code));
+        append_array_op_asm(&((yyvsp[-2].no)->valor.code), &((yyvsp[0].no)->valor.code));
         (yyval.no) = (yyvsp[-2].no);
     }
 }
@@ -1597,15 +1597,16 @@ yyreduce:
     (yyval.no) = (yyvsp[-1].no);
     if ((yyvsp[0].no) != NULL) {
         asd_add_child((yyvsp[-1].no), (yyvsp[0].no));
-        append_array_op_iloc(&((yyvsp[-1].no)->valor.code), &((yyvsp[0].no)->valor.code));
+        gera_main((yyval.no));
+        append_array_op_asm(&((yyvsp[-1].no)->valor.code), &((yyvsp[0].no)->valor.code));
     }
     func_atual = NULL;
 }
-#line 1605 "parser.tab.c"
+#line 1606 "parser.tab.c"
     break;
 
   case 11: /* Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_WITH Lista_params TK_PR_IS  */
-#line 148 "parser.y"
+#line 149 "parser.y"
                                                                             { 
     check_declared((yyvsp[-5].no));
     insere_funcao_tabela((yyvsp[-5].no)->valor, (yyvsp[-3].tipo_dado));
@@ -1616,11 +1617,11 @@ yyreduce:
     asd_free((yyvsp[-1].no));
     (yyval.no) = (yyvsp[-5].no);
 }
-#line 1620 "parser.tab.c"
+#line 1621 "parser.tab.c"
     break;
 
   case 12: /* Cab_func: Identificador TK_PR_RETURNS Tipo TK_PR_IS  */
-#line 158 "parser.y"
+#line 159 "parser.y"
                                                     { 
     check_declared((yyvsp[-3].no));
     insere_funcao_tabela((yyvsp[-3].no)->valor, (yyvsp[-1].tipo_dado));
@@ -1629,165 +1630,165 @@ yyreduce:
     push_pilha_tabelas(tabela);
     (yyval.no) = (yyvsp[-3].no);
 }
-#line 1633 "parser.tab.c"
+#line 1634 "parser.tab.c"
     break;
 
   case 13: /* Lista_params: Parametro ',' Lista_params  */
-#line 166 "parser.y"
+#line 167 "parser.y"
                                          {
     asd_add_child((yyvsp[-2].no), (yyvsp[0].no));
     (yyval.no) = (yyvsp[-2].no);
 }
-#line 1642 "parser.tab.c"
+#line 1643 "parser.tab.c"
     break;
 
   case 14: /* Lista_params: Parametro  */
-#line 170 "parser.y"
+#line 171 "parser.y"
                         {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1650 "parser.tab.c"
+#line 1651 "parser.tab.c"
     break;
 
   case 15: /* Parametro: Identificador TK_PR_AS Tipo  */
-#line 173 "parser.y"
+#line 174 "parser.y"
                                        { 
     valor_t valor_param = (yyvsp[-2].no)->valor;
     valor_param.tipo_dado_inferido = (yyvsp[0].tipo_dado);
     (yyval.no) = asd_new(valor_param);
     asd_free((yyvsp[-2].no));
 }
-#line 1661 "parser.tab.c"
+#line 1662 "parser.tab.c"
     break;
 
   case 16: /* Tipo: TK_PR_INT  */
-#line 179 "parser.y"
+#line 180 "parser.y"
                 { (yyval.tipo_dado) = (yyvsp[0].tipo_dado); }
-#line 1667 "parser.tab.c"
+#line 1668 "parser.tab.c"
     break;
 
   case 17: /* Tipo: TK_PR_FLOAT  */
-#line 180 "parser.y"
+#line 181 "parser.y"
                   { (yyval.tipo_dado) = (yyvsp[0].tipo_dado); }
-#line 1673 "parser.tab.c"
+#line 1674 "parser.tab.c"
     break;
 
   case 18: /* Corpo_func: Bloco_func  */
-#line 181 "parser.y"
+#line 182 "parser.y"
                        {
     pop_pilha_tabelas();
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1682 "parser.tab.c"
+#line 1683 "parser.tab.c"
     break;
 
   case 19: /* Comando: Bloco  */
-#line 185 "parser.y"
+#line 186 "parser.y"
                { 
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1690 "parser.tab.c"
+#line 1691 "parser.tab.c"
     break;
 
   case 20: /* Comando: Dec_var_com  */
-#line 188 "parser.y"
+#line 189 "parser.y"
                      { 
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1698 "parser.tab.c"
+#line 1699 "parser.tab.c"
     break;
 
   case 21: /* Comando: Dec_var_com_atrib  */
-#line 191 "parser.y"
+#line 192 "parser.y"
                            {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1706 "parser.tab.c"
+#line 1707 "parser.tab.c"
     break;
 
   case 22: /* Comando: Atrib  */
-#line 194 "parser.y"
+#line 195 "parser.y"
                {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1714 "parser.tab.c"
+#line 1715 "parser.tab.c"
     break;
 
   case 23: /* Comando: Chama_func  */
-#line 197 "parser.y"
+#line 198 "parser.y"
                     {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1722 "parser.tab.c"
+#line 1723 "parser.tab.c"
     break;
 
   case 24: /* Comando: Retorno  */
-#line 200 "parser.y"
+#line 201 "parser.y"
                  {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1730 "parser.tab.c"
+#line 1731 "parser.tab.c"
     break;
 
   case 25: /* Comando: Fluxo  */
-#line 203 "parser.y"
+#line 204 "parser.y"
                {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1738 "parser.tab.c"
+#line 1739 "parser.tab.c"
     break;
 
   case 26: /* Bloco_func: '[' Lista_com ']'  */
-#line 206 "parser.y"
+#line 207 "parser.y"
                               { 
     (yyval.no) = (yyvsp[-1].no);
 }
-#line 1746 "parser.tab.c"
+#line 1747 "parser.tab.c"
     break;
 
   case 27: /* Bloco_func: '[' ']'  */
-#line 209 "parser.y"
+#line 210 "parser.y"
                     {
     (yyval.no) = NULL;
 }
-#line 1754 "parser.tab.c"
+#line 1755 "parser.tab.c"
     break;
 
   case 28: /* Empilha_tabela: %empty  */
-#line 212 "parser.y"
+#line 213 "parser.y"
                 {
     tabela_simbolos_t* tabela = init_tabela();
     push_pilha_tabelas(tabela);
 }
-#line 1763 "parser.tab.c"
+#line 1764 "parser.tab.c"
     break;
 
   case 29: /* Desempilha_tabela: %empty  */
-#line 216 "parser.y"
+#line 217 "parser.y"
                    {
     pop_pilha_tabelas();
 }
-#line 1771 "parser.tab.c"
+#line 1772 "parser.tab.c"
     break;
 
   case 30: /* Bloco: '[' Empilha_tabela Lista_com Desempilha_tabela ']'  */
-#line 219 "parser.y"
+#line 220 "parser.y"
                                                           { 
     (yyval.no) = (yyvsp[-2].no);
 }
-#line 1779 "parser.tab.c"
+#line 1780 "parser.tab.c"
     break;
 
   case 31: /* Bloco: '[' ']'  */
-#line 222 "parser.y"
+#line 223 "parser.y"
                {
     (yyval.no) = NULL;
 }
-#line 1787 "parser.tab.c"
+#line 1788 "parser.tab.c"
     break;
 
   case 32: /* Lista_com: Comando Lista_com  */
-#line 225 "parser.y"
+#line 226 "parser.y"
                              { 
     if ((yyvsp[0].no) == NULL && (yyvsp[-1].no) != NULL) {
         // Lista_com pode ser NULL, retorna só o Comando
@@ -1803,23 +1804,23 @@ yyreduce:
     else {
         // Comando e Lista_com existem, bota Lista_com como filho e retorna o comando
         asd_add_child((yyvsp[-1].no), (yyvsp[0].no));
-        append_array_op_iloc(&((yyvsp[-1].no)->valor.code), &((yyvsp[0].no)->valor.code));
+        append_array_op_asm(&((yyvsp[-1].no)->valor.code), &((yyvsp[0].no)->valor.code));
         (yyval.no) = (yyvsp[-1].no);
     }
 }
-#line 1811 "parser.tab.c"
+#line 1812 "parser.tab.c"
     break;
 
   case 33: /* Lista_com: Comando  */
-#line 244 "parser.y"
+#line 245 "parser.y"
                    {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 1819 "parser.tab.c"
+#line 1820 "parser.tab.c"
     break;
 
   case 34: /* Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo  */
-#line 247 "parser.y"
+#line 248 "parser.y"
                                                    { 
     check_declared((yyvsp[-2].no));
     insere_variavel_tabela((yyvsp[-2].no)->valor, (yyvsp[0].tipo_dado));
@@ -1828,19 +1829,19 @@ yyreduce:
     // Nem todo identificador vai virar um nó, nesses casos deletamos o nó que foi alocado
     asd_free((yyvsp[-2].no));
 }
-#line 1832 "parser.tab.c"
+#line 1833 "parser.tab.c"
     break;
 
   case 35: /* Dec_var_com: Dec_var  */
-#line 255 "parser.y"
+#line 256 "parser.y"
                      { 
     (yyval.no) = NULL;
 }
-#line 1840 "parser.tab.c"
+#line 1841 "parser.tab.c"
     break;
 
   case 36: /* Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal  */
-#line 258 "parser.y"
+#line 259 "parser.y"
                                                                                 { 
     check_declared((yyvsp[-4].no));
     insere_variavel_tabela((yyvsp[-4].no)->valor, (yyvsp[-2].tipo_dado));
@@ -1851,8 +1852,7 @@ yyreduce:
     insere_literal_tabela((yyvsp[0].no)->valor, (yyvsp[0].no)->valor.tipo_dado_inferido);
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-4].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-4].no), (yyvsp[0].no));
-    gera_load_lit((yyvsp[0].no));
-    gera_store_var((yyval.no), (yyvsp[-4].no), (yyvsp[0].no));
+    //gera_store_lit($$, $2, $6);
 }
 #line 1858 "parser.tab.c"
     break;
@@ -1897,7 +1897,7 @@ yyreduce:
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     set_tipo_da_tabela((yyvsp[-2].no), (yyvsp[-2].no)->valor.lexema);
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_store_var((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    gera_store((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
 }
 #line 1903 "parser.tab.c"
     break;
@@ -1979,323 +1979,324 @@ yyreduce:
     valor_t valor = valor_simples("return");
     (yyval.no) = asd_create_and_add_1(valor, (yyvsp[-2].no));
     inferencia_tipo_return((yyval.no), (yyvsp[-2].no), (yyvsp[0].tipo_dado));
+    gera_retorno((yyval.no), (yyvsp[-2].no));
 }
-#line 1984 "parser.tab.c"
+#line 1985 "parser.tab.c"
     break;
 
   case 47: /* Fluxo: Fluxo_cond  */
-#line 347 "parser.y"
+#line 348 "parser.y"
                   { (yyval.no) = (yyvsp[0].no); }
-#line 1990 "parser.tab.c"
+#line 1991 "parser.tab.c"
     break;
 
   case 48: /* Fluxo: Fluxo_iter  */
-#line 348 "parser.y"
+#line 349 "parser.y"
                   { (yyval.no) = (yyvsp[0].no); }
-#line 1996 "parser.tab.c"
+#line 1997 "parser.tab.c"
     break;
 
   case 49: /* Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco  */
-#line 349 "parser.y"
+#line 350 "parser.y"
                                              {
     valor_t valor = valor_simples("if");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     (yyval.no)->valor.tipo_dado_inferido = (yyvsp[-2].no)->valor.tipo_dado_inferido;
-    gera_if((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_if($$, $3, $5);
 }
-#line 2007 "parser.tab.c"
+#line 2008 "parser.tab.c"
     break;
 
   case 50: /* Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco  */
-#line 355 "parser.y"
+#line 356 "parser.y"
                                                               {
     check_if_else((yyvsp[-2].no), (yyvsp[0].no));
     valor_t valor = valor_simples("if");
     (yyval.no) = asd_create_and_add_3(valor, (yyvsp[-4].no), (yyvsp[-2].no), (yyvsp[0].no));
     (yyval.no)->valor.tipo_dado_inferido = (yyvsp[-4].no)->valor.tipo_dado_inferido;
-    gera_if_else((yyval.no), (yyvsp[-4].no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_if_else($$, $3, $5, $7);
 }
-#line 2019 "parser.tab.c"
+#line 2020 "parser.tab.c"
     break;
 
   case 51: /* Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco  */
-#line 362 "parser.y"
+#line 363 "parser.y"
                                                 {
     valor_t valor = valor_simples("while");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     (yyval.no)->valor.tipo_dado_inferido = (yyvsp[-2].no)->valor.tipo_dado_inferido;
-    gera_while((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_while($$, $3, $5);
 }
-#line 2030 "parser.tab.c"
+#line 2031 "parser.tab.c"
     break;
 
   case 52: /* Expressao: T8  */
-#line 368 "parser.y"
+#line 369 "parser.y"
               {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 2038 "parser.tab.c"
+#line 2039 "parser.tab.c"
     break;
 
   case 53: /* T8: T8 '|' T7  */
-#line 371 "parser.y"
+#line 372 "parser.y"
               {
     valor_t valor = valor_simples("|");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("or", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("or", $$, $1, $3);
 }
-#line 2049 "parser.tab.c"
+#line 2050 "parser.tab.c"
     break;
 
   case 54: /* T8: T7  */
-#line 377 "parser.y"
+#line 378 "parser.y"
        {
     (yyval.no) = (yyvsp[0].no);
 }
-#line 2057 "parser.tab.c"
+#line 2058 "parser.tab.c"
     break;
 
   case 55: /* T7: T7 '&' T6  */
-#line 380 "parser.y"
+#line 381 "parser.y"
               {
     valor_t valor = valor_simples("&");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("and", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("and", $$, $1, $3);
 }
-#line 2068 "parser.tab.c"
+#line 2069 "parser.tab.c"
     break;
 
   case 56: /* T7: T6  */
-#line 386 "parser.y"
+#line 387 "parser.y"
        { (yyval.no) = (yyvsp[0].no); }
-#line 2074 "parser.tab.c"
+#line 2075 "parser.tab.c"
     break;
 
   case 57: /* T6: T6 TK_OC_EQ T5  */
-#line 387 "parser.y"
+#line 388 "parser.y"
                    {
     valor_t valor = valor_simples("==");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("cmp_EQ", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("cmp_EQ", $$, $1, $3);
 }
-#line 2085 "parser.tab.c"
+#line 2086 "parser.tab.c"
     break;
 
   case 58: /* T6: T6 TK_OC_NE T5  */
-#line 393 "parser.y"
+#line 394 "parser.y"
                    { 
     valor_t valor = valor_simples("!=");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("cmp_NE", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("cmp_NE", $$, $1, $3);
 }
-#line 2096 "parser.tab.c"
+#line 2097 "parser.tab.c"
     break;
 
   case 59: /* T6: T5  */
-#line 399 "parser.y"
+#line 400 "parser.y"
        { (yyval.no) = (yyvsp[0].no); }
-#line 2102 "parser.tab.c"
+#line 2103 "parser.tab.c"
     break;
 
   case 60: /* T5: T5 TK_OC_GE T4  */
-#line 400 "parser.y"
+#line 401 "parser.y"
                    { 
     valor_t valor = valor_simples(">=");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("cmp_GE", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("cmp_GE", $$, $1, $3);
 }
-#line 2113 "parser.tab.c"
+#line 2114 "parser.tab.c"
     break;
 
   case 61: /* T5: T5 TK_OC_LE T4  */
-#line 406 "parser.y"
+#line 407 "parser.y"
                    {
     valor_t valor = valor_simples("<=");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("cmp_LE", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("cmp_LE", $$, $1, $3);
 }
-#line 2124 "parser.tab.c"
+#line 2125 "parser.tab.c"
     break;
 
   case 62: /* T5: T5 '<' T4  */
-#line 412 "parser.y"
+#line 413 "parser.y"
               {
     valor_t valor = valor_simples("<");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("cmp_LT", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("cmp_LT", $$, $1, $3);
 }
-#line 2135 "parser.tab.c"
+#line 2136 "parser.tab.c"
     break;
 
   case 63: /* T5: T5 '>' T4  */
-#line 418 "parser.y"
+#line 419 "parser.y"
               {
     valor_t valor = valor_simples(">");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("cmp_GT", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("cmp_GT", $$, $1, $3);
 }
-#line 2146 "parser.tab.c"
+#line 2147 "parser.tab.c"
     break;
 
   case 64: /* T5: T4  */
-#line 424 "parser.y"
+#line 425 "parser.y"
        { (yyval.no) = (yyvsp[0].no); }
-#line 2152 "parser.tab.c"
+#line 2153 "parser.tab.c"
     break;
 
   case 65: /* T4: T4 '+' T3  */
-#line 425 "parser.y"
+#line 426 "parser.y"
               { 
     valor_t valor = valor_simples("+");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("add", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("add", $$, $1, $3);
 }
-#line 2163 "parser.tab.c"
+#line 2164 "parser.tab.c"
     break;
 
   case 66: /* T4: T4 '-' T3  */
-#line 431 "parser.y"
+#line 432 "parser.y"
               {
     valor_t valor = valor_simples("-");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("sub", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("sub", $$, $1, $3);
 }
-#line 2174 "parser.tab.c"
+#line 2175 "parser.tab.c"
     break;
 
   case 67: /* T4: T3  */
-#line 437 "parser.y"
+#line 438 "parser.y"
        { (yyval.no) = (yyvsp[0].no); }
-#line 2180 "parser.tab.c"
+#line 2181 "parser.tab.c"
     break;
 
   case 68: /* T3: T3 '*' T2  */
-#line 438 "parser.y"
+#line 439 "parser.y"
               { 
     valor_t valor = valor_simples("*");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("mult", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("mult", $$, $1, $3);
 }
-#line 2191 "parser.tab.c"
+#line 2192 "parser.tab.c"
     break;
 
   case 69: /* T3: T3 '/' T2  */
-#line 444 "parser.y"
+#line 445 "parser.y"
                {
     valor_t valor = valor_simples("/");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
-    gera_op_3("div", (yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
+    //gera_op_3("div", $$, $1, $3);
 }
-#line 2202 "parser.tab.c"
+#line 2203 "parser.tab.c"
     break;
 
   case 70: /* T3: T3 '%' T2  */
-#line 450 "parser.y"
+#line 451 "parser.y"
                {
     valor_t valor = valor_simples("%");
     (yyval.no) = asd_create_and_add_2(valor, (yyvsp[-2].no), (yyvsp[0].no));
     inferencia_tipo_op_binaria((yyval.no), (yyvsp[-2].no), (yyvsp[0].no));
     // Ignorar para e5
 }
-#line 2213 "parser.tab.c"
+#line 2214 "parser.tab.c"
     break;
 
   case 71: /* T3: T2  */
-#line 456 "parser.y"
+#line 457 "parser.y"
        { (yyval.no) = (yyvsp[0].no); }
-#line 2219 "parser.tab.c"
+#line 2220 "parser.tab.c"
     break;
 
   case 72: /* T2: '+' T2  */
-#line 457 "parser.y"
+#line 458 "parser.y"
            {
     valor_t valor = valor_simples("+");
     (yyval.no) = asd_create_and_add_1(valor, (yyvsp[0].no));
     (yyval.no)->valor.tipo_dado_inferido = (yyvsp[0].no)->valor.tipo_dado_inferido;
     // O que essa operação faz??!
 }
-#line 2230 "parser.tab.c"
+#line 2231 "parser.tab.c"
     break;
 
   case 73: /* T2: '-' T2  */
-#line 463 "parser.y"
+#line 464 "parser.y"
             {
     valor_t valor = valor_simples("-");
     (yyval.no) = asd_create_and_add_1(valor, (yyvsp[0].no));
     (yyval.no)->valor.tipo_dado_inferido = (yyvsp[0].no)->valor.tipo_dado_inferido;
-    gera_sub_unario((yyval.no), (yyvsp[0].no));
+    //gera_sub_unario($$, $2);
 }
-#line 2241 "parser.tab.c"
+#line 2242 "parser.tab.c"
     break;
 
   case 74: /* T2: '!' T2  */
-#line 469 "parser.y"
+#line 470 "parser.y"
            {
     valor_t valor = valor_simples("!");
     (yyval.no) = asd_create_and_add_1(valor, (yyvsp[0].no));
     (yyval.no)->valor.tipo_dado_inferido = (yyvsp[0].no)->valor.tipo_dado_inferido;
-    gera_not_unario((yyval.no), (yyvsp[0].no));
+    //gera_not_unario($$, $2);
 }
-#line 2252 "parser.tab.c"
+#line 2253 "parser.tab.c"
     break;
 
   case 75: /* T2: T1  */
-#line 475 "parser.y"
+#line 476 "parser.y"
        { (yyval.no) = (yyvsp[0].no); }
-#line 2258 "parser.tab.c"
+#line 2259 "parser.tab.c"
     break;
 
   case 76: /* T1: '(' Expressao ')'  */
-#line 476 "parser.y"
+#line 477 "parser.y"
                       { (yyval.no) = (yyvsp[-1].no); }
-#line 2264 "parser.tab.c"
+#line 2265 "parser.tab.c"
     break;
 
   case 77: /* T1: Identificador  */
-#line 477 "parser.y"
+#line 478 "parser.y"
                   { 
     // Aqui o Identificador está sendo usando em uma expressão
     check_undeclared((yyvsp[0].no));
     check_is_var((yyvsp[0].no));
     set_tipo_da_tabela((yyvsp[0].no), (yyvsp[0].no)->valor.lexema);
-    gera_load_var((yyvsp[0].no));
+    //gera_load_var($1);
     (yyval.no) = (yyvsp[0].no); 
 }
-#line 2277 "parser.tab.c"
+#line 2278 "parser.tab.c"
     break;
 
   case 78: /* T1: Literal  */
-#line 485 "parser.y"
+#line 486 "parser.y"
             { 
     insere_literal_tabela((yyvsp[0].no)->valor, (yyvsp[0].no)->valor.tipo_dado_inferido);
-    gera_load_lit((yyvsp[0].no));
+    gera_lit((yyvsp[0].no));
     (yyval.no) = (yyvsp[0].no);
 }
-#line 2287 "parser.tab.c"
+#line 2288 "parser.tab.c"
     break;
 
   case 79: /* T1: Chama_func  */
-#line 490 "parser.y"
+#line 491 "parser.y"
                { 
     (yyval.no) = (yyvsp[0].no); 
 }
-#line 2295 "parser.tab.c"
+#line 2296 "parser.tab.c"
     break;
 
 
-#line 2299 "parser.tab.c"
+#line 2300 "parser.tab.c"
 
       default: break;
     }
@@ -2519,7 +2520,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 493 "parser.y"
+#line 494 "parser.y"
 
 
 void yyerror (char const *mensagem) {

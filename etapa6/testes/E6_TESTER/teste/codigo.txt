@@ -1,0 +1,5 @@
+main returns int is [
+    declare x as int
+    x is 5
+    return 6 as int
+];

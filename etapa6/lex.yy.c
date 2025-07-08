@@ -523,7 +523,7 @@ char *yytext;
 #include "token.h"
 #include "utils.h"
 #include "asd.h"
-#include "iloc.h"
+#include "asm.h"
 #line 528 "lex.yy.c"
 #line 529 "lex.yy.c"
 
@@ -986,7 +986,7 @@ YY_RULE_SETUP
     aux->lexema = strdup(yytext);
     aux->linha_token = yylineno;
     aux->tipo = TIPO_IDENTIFICADOR;
-    init_array_op_iloc(&(aux->code));
+    init_array_op_asm(&(aux->code));
     yylval.valor_lexico = aux;
     return TK_ID; 
     /*
@@ -1005,7 +1005,7 @@ YY_RULE_SETUP
     aux->linha_token = yylineno;
     aux->tipo = TIPO_LITERAL;
     aux->tipo_dado_inferido = TIPO_DADO_FLOAT;
-    init_array_op_iloc(&(aux->code));
+    init_array_op_asm(&(aux->code));
     yylval.valor_lexico = aux;
     return TK_LI_FLOAT; 
 }
@@ -1019,7 +1019,7 @@ YY_RULE_SETUP
     aux->linha_token = yylineno;
     aux->tipo = TIPO_LITERAL;
     aux->tipo_dado_inferido = TIPO_DADO_INT;
-    init_array_op_iloc(&(aux->code));
+    init_array_op_asm(&(aux->code));
     yylval.valor_lexico = aux;
     return TK_LI_INT; 
 }

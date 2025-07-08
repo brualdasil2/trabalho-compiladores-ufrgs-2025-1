@@ -5,7 +5,7 @@
 #include "token.h"
 #include "utils.h"
 #include "asd.h"
-#include "iloc.h"
+#include "asm.h"
 %}
 
 %option noyywrap yylineno
@@ -58,7 +58,7 @@ with { return TK_PR_WITH; }
     aux->lexema = strdup(yytext);
     aux->linha_token = yylineno;
     aux->tipo = TIPO_IDENTIFICADOR;
-    init_array_op_iloc(&(aux->code));
+    init_array_op_asm(&(aux->code));
     yylval.valor_lexico = aux;
     return TK_ID; 
     /*
@@ -74,7 +74,7 @@ with { return TK_PR_WITH; }
     aux->linha_token = yylineno;
     aux->tipo = TIPO_LITERAL;
     aux->tipo_dado_inferido = TIPO_DADO_FLOAT;
-    init_array_op_iloc(&(aux->code));
+    init_array_op_asm(&(aux->code));
     yylval.valor_lexico = aux;
     return TK_LI_FLOAT; 
 }
@@ -84,7 +84,7 @@ with { return TK_PR_WITH; }
     aux->linha_token = yylineno;
     aux->tipo = TIPO_LITERAL;
     aux->tipo_dado_inferido = TIPO_DADO_INT;
-    init_array_op_iloc(&(aux->code));
+    init_array_op_asm(&(aux->code));
     yylval.valor_lexico = aux;
     return TK_LI_INT; 
 }

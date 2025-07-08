@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "asd.h"
-#include "iloc.h"
+#include "asm.h"
 
 valor_t valor_simples(char* lexema) {
   valor_t valor;
@@ -10,7 +10,7 @@ valor_t valor_simples(char* lexema) {
   valor.linha_token = 0;
   valor.tipo = TIPO_NO;
   valor.tipo_dado_inferido = TIPO_DADO_NADA;
-  init_array_op_iloc(&valor.code);
+  init_array_op_asm(&valor.code);
   return valor;
 }
 
@@ -71,7 +71,7 @@ void asd_free(asd_tree_t *tree)
     }
     free(tree->children);
     free(tree->valor.lexema);
-    free_array_op_iloc(&(tree->valor.code));
+    free_array_op_asm(&(tree->valor.code));
     free(tree);
   }else{
     printf("Erro: %s recebeu parâmetro tree = %p.\n", __FUNCTION__, tree);

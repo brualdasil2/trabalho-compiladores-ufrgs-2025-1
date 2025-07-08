@@ -19,7 +19,7 @@ void insere_item_tabela_simbolos(tabela_simbolos_t* tabela, item_tabela_t item) 
     }
     item.is_global = tabela->is_global;
     // calcula offset a partir do offset do ultimo int adicionado
-    item.offset = 0;
+    item.offset = 4;
     for (int i = tabela->tamanho_usado-1; i >= 0; i--) {
         if (tabela->itens[i].natureza != NAT_IDENTIFICADOR) {
             continue;

@@ -10,7 +10,7 @@
 #include "erros.h"
 #include "utils.h"
 #include "helpers_semantica.h"
-#include "helpers_iloc.h"
+#include "helpers_asm.h"
 int yylex(void);
 void yyerror (char const *mensagem);
 int get_line_number();
@@ -124,7 +124,7 @@ Lista: Elemento ',' Lista {
     else {
         // Os dois existem, bota lista de filho do elemento
         asd_add_child($1, $3);
-        append_array_op_iloc(&($1->valor.code), &($3->valor.code));
+        append_array_op_asm(&($1->valor.code), &($3->valor.code));
         $$ = $1;
     }
 }
@@ -141,7 +141,8 @@ Def_func: Cab_func Corpo_func {
     $$ = $1;
     if ($2 != NULL) {
         asd_add_child($1, $2);
-        append_array_op_iloc(&($1->valor.code), &($2->valor.code));
+        gera_main($$);
+        append_array_op_asm(&($1->valor.code), &($2->valor.code));
     }
     func_atual = NULL;
 }
@@ -237,7 +238,7 @@ Lista_com: Comando Lista_com {
     else {
         // Comando e Lista_com existem, bota Lista_com como filho e retorna o comando
         asd_add_child($1, $2);
-        append_array_op_iloc(&($1->valor.code), &($2->valor.code));
+        append_array_op_asm(&($1->valor.code), &($2->valor.code));
         $$ = $1;
     }
 }
@@ -265,8 +266,7 @@ Dec_var_com_atrib: TK_PR_DECLARE Identificador TK_PR_AS Tipo TK_PR_WITH Literal 
     insere_literal_tabela($6->valor, $6->valor.tipo_dado_inferido);
     $$ = asd_create_and_add_2(valor, $2, $6);
     inferencia_tipo_op_binaria($$, $2, $6);
-    gera_load_lit($6);
-    gera_store_var($$, $2, $6);
+    //gera_store_lit($$, $2, $6);
 }
 Identificador: TK_ID {
     // Complicado fazer ações semanticas aqui, pois n se sabe se esse ID é de uma declaração ou de um uso
@@ -291,7 +291,7 @@ Atrib: Identificador TK_PR_IS Expressao {
     $$ = asd_create_and_add_2(valor, $1, $3);
     set_tipo_da_tabela($1, $1->valor.lexema);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_store_var($$, $1, $3);
+    gera_store($$, $1, $3);
 }
 Chama_func: Identificador '(' Lista_args ')' {
     check_undeclared($1);
@@ -343,6 +343,7 @@ Retorno: TK_PR_RETURN Expressao TK_PR_AS Tipo {
     valor_t valor = valor_simples("return");
     $$ = asd_create_and_add_1(valor, $2);
     inferencia_tipo_return($$, $2, $4);
+    gera_retorno($$, $2);
 }
 Fluxo: Fluxo_cond { $$ = $1; }
 Fluxo: Fluxo_iter { $$ = $1; }
@@ -350,20 +351,20 @@ Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco {
     valor_t valor = valor_simples("if");
     $$ = asd_create_and_add_2(valor, $3, $5);
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
-    gera_if($$, $3, $5);
+    //gera_if($$, $3, $5);
 }
 Fluxo_cond: TK_PR_IF '(' Expressao ')' Bloco TK_PR_ELSE Bloco {
     check_if_else($5, $7);
     valor_t valor = valor_simples("if");
     $$ = asd_create_and_add_3(valor, $3, $5, $7);
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
-    gera_if_else($$, $3, $5, $7);
+    //gera_if_else($$, $3, $5, $7);
 }
 Fluxo_iter: TK_PR_WHILE '(' Expressao ')' Bloco {
     valor_t valor = valor_simples("while");
     $$ = asd_create_and_add_2(valor, $3, $5);
     $$->valor.tipo_dado_inferido = $3->valor.tipo_dado_inferido;
-    gera_while($$, $3, $5);
+    //gera_while($$, $3, $5);
 }
 Expressao: T8 {
     $$ = $1;
@@ -372,7 +373,7 @@ T8: T8 '|' T7 {
     valor_t valor = valor_simples("|");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("or", $$, $1, $3);
+    //gera_op_3("or", $$, $1, $3);
 }
 T8: T7 {
     $$ = $1;
@@ -381,71 +382,71 @@ T7: T7 '&' T6 {
     valor_t valor = valor_simples("&");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("and", $$, $1, $3);
+    //gera_op_3("and", $$, $1, $3);
 }
 T7: T6 { $$ = $1; }
 T6: T6 TK_OC_EQ T5 {
     valor_t valor = valor_simples("==");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("cmp_EQ", $$, $1, $3);
+    //gera_op_3("cmp_EQ", $$, $1, $3);
 }
 T6: T6 TK_OC_NE T5 { 
     valor_t valor = valor_simples("!=");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("cmp_NE", $$, $1, $3);
+    //gera_op_3("cmp_NE", $$, $1, $3);
 }
 T6: T5 { $$ = $1; }
 T5: T5 TK_OC_GE T4 { 
     valor_t valor = valor_simples(">=");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("cmp_GE", $$, $1, $3);
+    //gera_op_3("cmp_GE", $$, $1, $3);
 }
 T5: T5 TK_OC_LE T4 {
     valor_t valor = valor_simples("<=");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("cmp_LE", $$, $1, $3);
+    //gera_op_3("cmp_LE", $$, $1, $3);
 }
 T5: T5 '<' T4 {
     valor_t valor = valor_simples("<");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("cmp_LT", $$, $1, $3);
+    //gera_op_3("cmp_LT", $$, $1, $3);
 }
 T5: T5 '>' T4 {
     valor_t valor = valor_simples(">");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("cmp_GT", $$, $1, $3);
+    //gera_op_3("cmp_GT", $$, $1, $3);
 }
 T5: T4 { $$ = $1; }
 T4: T4 '+' T3 { 
     valor_t valor = valor_simples("+");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("add", $$, $1, $3);
+    //gera_op_3("add", $$, $1, $3);
 }
 T4: T4 '-' T3 {
     valor_t valor = valor_simples("-");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("sub", $$, $1, $3);
+    //gera_op_3("sub", $$, $1, $3);
 }
 T4: T3 { $$ = $1; }
 T3: T3 '*' T2 { 
     valor_t valor = valor_simples("*");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("mult", $$, $1, $3);
+    //gera_op_3("mult", $$, $1, $3);
 }
 T3: T3 '/' T2  {
     valor_t valor = valor_simples("/");
     $$ = asd_create_and_add_2(valor, $1, $3);
     inferencia_tipo_op_binaria($$, $1, $3);
-    gera_op_3("div", $$, $1, $3);
+    //gera_op_3("div", $$, $1, $3);
 }
 T3: T3 '%' T2  {
     valor_t valor = valor_simples("%");
@@ -464,13 +465,13 @@ T2: '-' T2  {
     valor_t valor = valor_simples("-");
     $$ = asd_create_and_add_1(valor, $2);
     $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
-    gera_sub_unario($$, $2);
+    //gera_sub_unario($$, $2);
 }
 T2: '!' T2 {
     valor_t valor = valor_simples("!");
     $$ = asd_create_and_add_1(valor, $2);
     $$->valor.tipo_dado_inferido = $2->valor.tipo_dado_inferido;
-    gera_not_unario($$, $2);
+    //gera_not_unario($$, $2);
 }
 T2: T1 { $$ = $1; }
 T1: '(' Expressao ')' { $$ = $2; }
@@ -479,12 +480,12 @@ T1: Identificador {
     check_undeclared($1);
     check_is_var($1);
     set_tipo_da_tabela($1, $1->valor.lexema);
-    gera_load_var($1);
+    //gera_load_var($1);
     $$ = $1; 
 }
 T1: Literal { 
     insere_literal_tabela($1->valor, $1->valor.tipo_dado_inferido);
-    gera_load_lit($1);
+    gera_lit($1);
     $$ = $1;
 }
 T1: Chama_func { 
