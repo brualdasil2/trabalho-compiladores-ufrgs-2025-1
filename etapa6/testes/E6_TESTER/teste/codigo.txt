@@ -1,3 +1,6 @@
+declare a as int,
+declare c as int,
+
 main returns int is [
     declare x as int
     x is 5

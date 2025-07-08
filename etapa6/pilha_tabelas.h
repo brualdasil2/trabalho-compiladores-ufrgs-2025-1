@@ -15,6 +15,7 @@ void init_pilha_tabelas();
 void push_pilha_tabelas(tabela_simbolos_t* tabela);
 status_t pop_pilha_tabelas();
 tabela_simbolos_t* get_tabela_topo_pilha();
+tabela_simbolos_t* get_tabela_global();
 item_tabela_t* buscar_item_pilha_tabelas(char* chave);
 void free_pilha_tabelas();
 

@@ -37,6 +37,10 @@ tabela_simbolos_t* get_tabela_topo_pilha() {
     return pilha.tabelas[pilha.tamanho_usado-1];
 }
 
+tabela_simbolos_t* get_tabela_global() {
+    return pilha.tabelas[0];
+}
+
 item_tabela_t* buscar_item_pilha_tabelas(char* chave){
     item_tabela_t* item;
     // percorre a pilha do topo até a base, importante pra priorizar o escopo local

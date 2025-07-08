@@ -9,6 +9,7 @@ void gera_store(asd_tree_t* op_node, asd_tree_t* id_node, asd_tree_t* exp_node);
 void gera_lit(asd_tree_t* node);
 void gera_retorno(asd_tree_t* ret_node, asd_tree_t* exp_node);
 void gera_main(asd_tree_t* main_node);
+void gera_var_global(asd_tree_t* node, char *var, int index);
 
 // void gera_load_var(asd_tree_t* node);
 // void gera_load_lit(asd_tree_t* node);

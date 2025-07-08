@@ -140,6 +140,14 @@ Elemento: Dec_var {
 Def_func: Cab_func Corpo_func { 
     $$ = $1;
     if ($2 != NULL) {
+        tabela_simbolos_t* tabela_global = get_tabela_global();
+        if(tabela_global != NULL)
+        {
+            for(int i = 0; i< tabela_global->tamanho_usado; i++)
+            {
+                if(tabela_global->itens[i].natureza == NAT_IDENTIFICADOR)   gera_var_global($$, tabela_global->itens[i].chave, i);
+            }
+        }
         asd_add_child($1, $2);
         gera_main($$);
         append_array_op_asm(&($1->valor.code), &($2->valor.code));
@@ -248,7 +256,6 @@ Lista_com: Comando {
 Dec_var: TK_PR_DECLARE Identificador TK_PR_AS Tipo { 
     check_declared($2);
     insere_variavel_tabela($2->valor, $4);
-
     $$ = NULL;
     // Nem todo identificador vai virar um nó, nesses casos deletamos o nó que foi alocado
     asd_free($2);

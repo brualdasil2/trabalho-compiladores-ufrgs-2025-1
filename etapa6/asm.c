@@ -95,6 +95,13 @@ void append_array_op_asm(array_op_asm_t* dst, array_op_asm_t* src) {
     free_array_op_asm(src);
 }
 
+void prepend_array_op_asm(array_op_asm_t* dst, array_op_asm_t* src) {
+    for (int i = 0; i < dst->tamanho_usado; i++) {
+        insere_item_array_op_asm(src, dst->ops[i]);
+    }
+    free_array_op_asm(dst);
+}
+
 void insere_item_array_op_asm(array_op_asm_t* array, op_asm_t item) {
     if (array->tamanho_usado == array->tamanho_total) {
         array->tamanho_total += DELTA_TAM;
