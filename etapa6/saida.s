@@ -20,6 +20,8 @@ main:
 	pushq %rbp 
 	movq	%rsp, %rbp 
 	movl  $5, -4(%rbp)
-	movl  $6, %eax
+	movl  -4(%rbp), %edx
+	movl  %edx, a(%rip)
+	movl  a(%rip), %eax
 	popq  %rbp
 	ret 

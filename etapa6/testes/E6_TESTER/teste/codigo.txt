@@ -4,5 +4,6 @@ declare c as int,
 main returns int is [
     declare x as int
     x is 5
-    return 6 as int
+    a is x
+    return a as int
 ];

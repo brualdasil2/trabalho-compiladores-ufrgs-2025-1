@@ -5,10 +5,33 @@
 
 void gera_store(asd_tree_t* op_node, asd_tree_t* id_node, asd_tree_t* exp_node) {
     //recebe lit ou valor temporario na expressao
-    item_tabela_t* item = buscar_item_pilha_tabelas(id_node->valor.lexema);
-    op_asm_t op = init_op_store(item->offset, item->is_global, exp_node->valor.temp);
+    item_tabela_t* item_destino = buscar_item_pilha_tabelas(id_node->valor.lexema);
+    int qtd_ops = 0;
+
+    op_asm_t op[2];
+    for(int i = 0; i<2; i++)
+    {
+        op[i] = init_op_asm();
+    }
+
+    if(exp_node->valor.tipo == TIPO_LITERAL)
+    {
+        op[0] = init_op_store(item_destino->offset, item_destino->is_global, exp_node->valor.temp.valor, id_node->valor.lexema);
+        qtd_ops = 1;
+    }
+    else
+    {
+        item_tabela_t* item_origem = buscar_item_pilha_tabelas(exp_node->valor.lexema);
+        op[0] = init_op_load_var_to_reg(item_origem->offset, item_origem->is_global, "%edx", exp_node->valor.lexema);
+        op[1] = init_op_store(item_destino->offset, item_destino->is_global, "%edx", id_node->valor.lexema);
+        qtd_ops = 2;
+    }
+    
     append_array_op_asm(&(op_node->valor.code), &(exp_node->valor.code));
-    insere_item_array_op_asm(&(op_node->valor.code), op);
+    for(int i = 0; i<qtd_ops; i++)
+    {
+        insere_item_array_op_asm(&(op_node->valor.code), op[i]);
+    }
 }
 
 void gera_lit(asd_tree_t* node) {
@@ -29,7 +52,7 @@ void gera_retorno(asd_tree_t* ret_node, asd_tree_t* exp_node) {
     else
     {
         item_tabela_t* item = buscar_item_pilha_tabelas(exp_node->valor.lexema);
-        op[0] = init_op_load_var_to_reg(item->offset, item->is_global, exp_node->valor.temp, "%eax");
+        op[0] = init_op_load_var_to_reg(item->offset, item->is_global, "%eax", exp_node->valor.lexema);
     }
     op[1] = init_op_popq("%rbp");
     op[2] = init_op_ret();

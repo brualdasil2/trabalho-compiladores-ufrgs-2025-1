@@ -17,13 +17,15 @@ op_asm_t init_op_asm() {
     return op;
 }
 
-op_asm_t init_op_store(int offset, int is_global, operando_asm_t temp) {
+op_asm_t init_op_store(int offset, int is_global, char* temp, char* var_name) {
     op_asm_t op = init_op_asm();
     strcpy(op.mnemonico.valor, "movl");
-    strcpy(op.op1.valor, temp.valor);
+    strcpy(op.op1.valor, temp);
     if (is_global)
-        strcpy(op.op2.valor, "rip");
-        //fazer manha
+    {
+        strcpy(op.op2.valor, var_name);
+        strcat(op.op2.valor, "(%rip)");
+    }
     else
     {
         set_operando_int(&op.op2, -offset);
@@ -40,12 +42,14 @@ op_asm_t init_lit(char* lit) {
     return op;
 }
 
-op_asm_t init_op_load_var_to_reg(int offset, int is_global, operando_asm_t temp, char* reg) {
+op_asm_t init_op_load_var_to_reg(int offset, int is_global, char* reg, char* var_name) {
     op_asm_t op = init_op_asm();
     strcpy(op.mnemonico.valor, "movl");
     if (is_global)
-        strcpy(op.op1.valor, "rip");
-        //fazer manha
+    {
+        strcpy(op.op1.valor, var_name);
+        strcat(op.op1.valor, "(%rip)");
+    }
     else
     {
         set_operando_int(&op.op1, -offset);

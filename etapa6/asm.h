@@ -35,9 +35,9 @@ typedef struct s_array_op_asm {
 
 void set_operando_int(operando_asm_t* operando, int valor);
 op_asm_t init_op_asm();
-op_asm_t init_op_store(int offset, int is_global, operando_asm_t temp);
+op_asm_t init_op_store(int offset, int is_global, char* temp, char *var_name);
 op_asm_t init_lit(char* lit);
-op_asm_t init_op_load_var_to_reg(int offset, int is_global, operando_asm_t temp, char* reg);
+op_asm_t init_op_load_var_to_reg(int offset, int is_global, char* reg, char *var_name);
 op_asm_t init_op_load_lit_to_reg(operando_asm_t lit, char* reg);
 op_asm_t init_op_pushq(char* reg);
 op_asm_t init_op_popq(char* reg);
